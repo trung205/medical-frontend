@@ -1,12 +1,28 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Plus, ChevronRight, Pencil, Trash2, FolderOpen } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { CategoryDialog } from "@/components/admin/category-dialog"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus, ChevronRight, Pencil, Trash2, FolderOpen } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { CategoryDialog } from "@/components/admin/category-dialog";
+import { useCategories, useCreateCategory, useUpdateCategory } from "@/hooks/admin/useCategories";
+import { CommonPagination } from "@/components/ui/common-pagination";
+import { useRouter, useParams } from "next/navigation"
 
 const mockCategories = [
   {
@@ -99,53 +115,83 @@ const mockCategories = [
     childCount: 0,
     productCount: 8,
   },
-]
+];
 
-type Category = (typeof mockCategories)[0]
+type Category = (typeof mockCategories)[0];
 
 export default function CategoriesPage() {
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const router = useRouter();
+  const [page, setPage] = useState(1);
+  // const [totalPages, setTotalPages] = useState(1);
+  const [condition, setCondition] = useState({
+    search: "",
+    level: 1,
+  });
+  const { data, isLoading, isError } = useCategories({
+    page,
+    search: condition.search,
+    level: condition.level,
+  });
+  const { mutate: mutateUpdate, isPending: isUpdating } = useUpdateCategory();
+  const { mutate: mutateCreate, isPending: isCreating } = useCreateCategory();
 
-  const displayCategories = selectedCategory
-    ? mockCategories.filter((cat) => cat.parentId === selectedCategory.id)
-    : mockCategories.filter((cat) => cat.level === 1)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const getBreadcrumb = () => {
-    if (!selectedCategory) return []
-    const path: Category[] = []
-    let current: Category | undefined = selectedCategory
-    while (current) {
-      path.unshift(current)
-      current = mockCategories.find((cat) => cat.id === current?.parentId)
-    }
-    return path
-  }
+  const { data: categories, pagination } = data || {};
+  const { totalPages, total } = pagination || {};
 
   const handleEdit = (category: Category) => {
-    setEditingCategory(category)
-    setIsDialogOpen(true)
-  }
+    setEditingCategory(category);
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmitEdit = (data: any) => {
+    console.log("[v0] Edit category data:", data);
+    mutateUpdate({
+      id: data.id,
+      payload: data,
+    });
+  };
 
   const handleDelete = (id: string) => {
     if (confirm("Bạn có chắc chắn muốn xóa danh mục này?")) {
-      console.log("[v0] Delete category:", id)
+      console.log("[v0] Delete category:", id);
     }
-  }
+  };
 
   const handleCreate = () => {
-    setEditingCategory(null)
-    setIsDialogOpen(true)
-  }
+    setEditingCategory(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmitCreate = (data: any) => {
+    console.log("[v0] Create category data:", data);
+    mutateCreate({
+      payload: data,
+    });
+  };
+
+  const handleShowCategory = (category: Category) => {
+    setSelectedCategory(category);
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Quản lý danh mục</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            Quản lý danh mục
+          </h1>
           <p className="text-muted-foreground mt-1">
-            {selectedCategory ? `Danh mục con của "${selectedCategory.name}"` : "Danh mục cấp 1"}
+            {/* {selectedCategory
+              ? `Danh mục con của "${selectedCategory.name}"`
+              : "Danh mục cấp 1"} */}
+            Danh mục cấp 1
           </p>
         </div>
         <Button onClick={handleCreate}>
@@ -154,7 +200,7 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      {selectedCategory && (
+      {/* {selectedCategory && (
         <div className="flex items-center gap-2 text-sm">
           <Button variant="ghost" size="sm" onClick={() => setSelectedCategory(null)}>
             Tất cả danh mục
@@ -173,12 +219,17 @@ export default function CategoriesPage() {
             </div>
           ))}
         </div>
-      )}
+      )} */}
 
       <Card>
         <CardHeader>
-          <CardTitle>{selectedCategory ? `Danh mục cấp ${selectedCategory.level + 1}` : "Danh mục cấp 1"}</CardTitle>
-          <CardDescription>{displayCategories.length} danh mục</CardDescription>
+          <CardTitle>
+            {/* {selectedCategory
+              ? `Danh mục cấp ${selectedCategory.level + 1}`
+              : "Danh mục cấp 1"} */}
+            Danh mục cấp 1
+          </CardTitle>
+          <CardDescription>{total} danh mục</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -186,15 +237,15 @@ export default function CategoriesPage() {
               <TableRow>
                 <TableHead>Tên danh mục</TableHead>
                 <TableHead>Slug</TableHead>
-                <TableHead>Mô tả</TableHead>
+                {/* <TableHead>Mô tả</TableHead> */}
                 <TableHead className="text-center">Danh mục con</TableHead>
-                <TableHead className="text-center">Sản phẩm</TableHead>
+                {/* <TableHead className="text-center">Sản phẩm</TableHead> */}
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {displayCategories.length > 0 ? (
-                displayCategories.map((category) => (
+              {categories?.length > 0 ? (
+                categories?.map((category: any) => (
                   <TableRow key={category.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -210,35 +261,47 @@ export default function CategoriesPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <code className="text-sm bg-muted px-2 py-1 rounded">{category.slug}</code>
+                      <code className="text-sm bg-muted px-2 py-1 rounded">
+                        {category.slug}
+                      </code>
                     </TableCell>
-                    <TableCell className="max-w-xs">
-                      <p className="text-sm text-muted-foreground truncate">{category.description}</p>
-                    </TableCell>
+                    {/* <TableCell className="max-w-xs">
+                      <p className="text-sm text-muted-foreground truncate">
+                        {category.description}
+                      </p>
+                    </TableCell> */}
                     <TableCell className="text-center">
-                      {category.childCount > 0 ? (
+                      {category.children.length > 0 ? (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setSelectedCategory(category)}
+                          onClick={() => router.push(`/admin/categories/${category.id}`)}
                           className="text-primary"
                         >
-                          {category.childCount} danh mục
+                          {category.children.length} danh mục
                           <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center">
+                    {/* <TableCell className="text-center">
                       <Badge variant="secondary">{category.productCount}</Badge>
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(category)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(category)}
+                        >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(category.id)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(category.id)}
+                        >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
@@ -247,13 +310,21 @@ export default function CategoriesPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell
+                    colSpan={6}
+                    className="text-center text-muted-foreground py-8"
+                  >
                     Chưa có danh mục con
                   </TableCell>
                 </TableRow>
               )}
             </TableBody>
           </Table>
+          <CommonPagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(p) => setPage(p)}
+          />
         </CardContent>
       </Card>
 
@@ -262,7 +333,9 @@ export default function CategoriesPage() {
         parentCategory={selectedCategory}
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
+        onHandleSubmitEdit={handleSubmitEdit}
+        onHandleSubmitCreate={handleSubmitCreate}
       />
     </div>
-  )
+  );
 }

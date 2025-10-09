@@ -17,8 +17,8 @@ const categorySchema = z.object({
     .string()
     .min(1, "Slug là bắt buộc")
     .regex(/^[a-z0-9-]+$/, "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"),
-  description: z.string().max(500, "Mô tả không được quá 500 ký tự"),
-  parentId: z.string().nullable(),
+  // description: z.string().max(500, "Mô tả không được quá 500 ký tự"),
+  // parentId: z.string().nullable(),
 })
 
 type CategoryFormData = z.infer<typeof categorySchema>
@@ -34,16 +34,18 @@ interface CategoryDialogProps {
   parentCategory?: any
   open: boolean
   onOpenChange: (open: boolean) => void
+  onHandleSubmitEdit: (data: any) => void
+  onHandleSubmitCreate: (data: any) => void
 }
 
-export function CategoryDialog({ category, parentCategory, open, onOpenChange }: CategoryDialogProps) {
+export function CategoryDialog({ category, parentCategory, open, onOpenChange, onHandleSubmitEdit, onHandleSubmitCreate }: CategoryDialogProps) {
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: "",
       slug: "",
-      description: "",
-      parentId: parentCategory?.id || null,
+      // description: "",
+      // parentId: parentCategory?.id || null,
     },
   })
 
@@ -52,21 +54,26 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
       form.reset({
         name: category.name,
         slug: category.slug,
-        description: category.description,
-        parentId: category.parentId,
+        // description: category.description,
+        // parentId: category.parentId,
       })
     } else {
       form.reset({
         name: "",
         slug: "",
-        description: "",
-        parentId: parentCategory?.id || null,
+        // description: "",
+        // parentId: parentCategory?.id || null,
       })
     }
   }, [category, parentCategory, form])
 
   const onSubmit = (data: CategoryFormData) => {
     console.log("[v0] Category data:", data)
+    if (category?.id) {
+      onHandleSubmitEdit({id: category?.id || "", ...data});
+    } else {
+      onHandleSubmitCreate({...data});
+    }
     onOpenChange(false)
   }
 
@@ -130,7 +137,7 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
@@ -142,9 +149,9 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="parentId"
               render={({ field }) => (
@@ -170,7 +177,7 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <div className="flex items-center gap-3 pt-4">
               <Button type="submit">{category ? "Cập nhật" : "Tạo danh mục"}</Button>
