@@ -23,12 +23,12 @@ const blogSchema = z.object({
     .string()
     .min(1, "Slug là bắt buộc")
     .regex(/^[a-z0-9-]+$/, "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"),
-  excerpt: z.string().min(1, "Mô tả ngắn là bắt buộc").max(300, "Mô tả ngắn không được quá 300 ký tự"),
+  excerpt: z.string().min(1, "Mô tả ngắn là bắt buộc"),
   content: z.string().min(1, "Nội dung là bắt buộc"),
   author: z.string().min(1, "Tên tác giả là bắt buộc"),
   status: z.enum(["draft", "published"]),
-  featured: z.boolean(),
-  image: z.string().min(1, "Hình ảnh là bắt buộc"),
+  isFeatured: z.boolean(),
+  image: z.string(),
 })
 
 type BlogFormData = z.infer<typeof blogSchema>
@@ -50,7 +50,7 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
       content: "",
       author: "",
       status: "draft",
-      featured: false,
+      isFeatured: false,
       image: "",
     },
   })
@@ -64,7 +64,7 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
         content: blog.content,
         author: blog.author,
         status: blog.status,
-        featured: blog.featured,
+        isFeatured: blog.isFeatured,
         image: blog.image,
       })
       setImagePreview(blog.image)
@@ -226,7 +226,7 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
 
                 <FormField
                   control={form.control}
-                  name="featured"
+                  name="isFeatured"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between rounded-lg border p-3">
                       <div className="space-y-0.5">

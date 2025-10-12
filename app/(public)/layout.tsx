@@ -1,4 +1,4 @@
-import { Providers } from "@/app/providers"; // dùng store public
+import { Providers } from "@/app/providers";
 
 export default function PublicLayout({
   children,

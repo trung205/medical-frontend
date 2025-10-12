@@ -24,13 +24,11 @@ export function CommonPagination({
 }: AppPaginationProps) {
   if (totalPages <= 1) return null
 
-  // Hàm xử lý khi click trang
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return
     onPageChange?.(page)
   }
 
-  // Tạo danh sách trang cần hiển thị (tối đa 5 trang, có dấu “...”)
   const getPages = () => {
     const pages: (number | string)[] = []
     const maxVisible = 5
@@ -62,7 +60,6 @@ export function CommonPagination({
   return (
     <Pagination className="mt-4">
       <PaginationContent>
-        {/* Nút Previous */}
         <PaginationItem>
           <PaginationPrevious
             href="#"
@@ -74,7 +71,6 @@ export function CommonPagination({
           />
         </PaginationItem>
 
-        {/* Các trang */}
         {pages.map((p, idx) => (
           <PaginationItem key={idx}>
             {typeof p === 'number' ? (
@@ -94,7 +90,6 @@ export function CommonPagination({
           </PaginationItem>
         ))}
 
-        {/* Nút Next */}
         <PaginationItem>
           <PaginationNext
             href="#"

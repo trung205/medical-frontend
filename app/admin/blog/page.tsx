@@ -5,53 +5,26 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { BlogTable } from "@/components/admin/blog-table"
 import Link from "next/link"
+import { useBlogs } from "@/hooks/admin/useBlogs"
+import { CommonPagination } from "@/components/ui/common-pagination"
 
-// Mock data
-const mockBlogs = [
-  {
-    id: "1",
-    title: "Hướng dẫn chọn mua máy siêu âm phù hợp cho phòng khám",
-    slug: "huong-dan-chon-mua-may-sieu-am-phu-hop-cho-phong-kham",
-    excerpt: "Máy siêu âm là thiết bị y tế quan trọng trong chẩn đoán. Bài viết này sẽ hướng dẫn bạn...",
-    author: "BS. Nguyễn Văn A",
-    status: "published",
-    featured: true,
-    image: "/blog-ultrasound-guide.jpg",
-    publishedAt: "2024-01-15",
-    views: 1250,
-  },
-  {
-    id: "2",
-    title: "Công nghệ AI trong chẩn đoán hình ảnh y tế",
-    slug: "cong-nghe-ai-trong-chan-doan-hinh-anh-y-te",
-    excerpt: "Trí tuệ nhân tạo đang cách mạng hóa ngành y tế, đặc biệt trong lĩnh vực chẩn đoán...",
-    author: "TS. Trần Thị B",
-    status: "published",
-    featured: true,
-    image: "/blog-ai-medical-imaging.jpg",
-    publishedAt: "2024-01-10",
-    views: 2100,
-  },
-  {
-    id: "3",
-    title: "Bảo trì thiết bị y tế: Những điều cần biết",
-    slug: "bao-tri-thiet-bi-y-te-nhung-dieu-can-biet",
-    excerpt: "Bảo trì định kỳ giúp thiết bị y tế hoạt động ổn định và kéo dài tuổi thọ...",
-    author: "KS. Lê Văn C",
-    status: "draft",
-    featured: false,
-    image: "/blog-equipment-maintenance.jpg",
-    publishedAt: null,
-    views: 0,
-  },
-]
 
 export default function BlogManagementPage() {
-  const [blogs, setBlogs] = useState(mockBlogs)
+
+   const [page, setPage] = useState(1);
+  const [conditions, setConditions] = useState({
+    search: "",
+  });
+
+  const {data: blogsData, isLoading}: any = useBlogs({
+    page,
+    ...conditions,
+  });
+  const { data: blogs = [], pagination = {} } = blogsData || {};
+  const { totalPages, total } = pagination || {};
 
   const handleDelete = (id: string) => {
     if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      setBlogs(blogs.filter((b) => b.id !== id))
     }
   }
 
@@ -71,6 +44,11 @@ export default function BlogManagementPage() {
       </div>
 
       <BlogTable data={blogs} onDelete={handleDelete} />
+      <CommonPagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   )
 }

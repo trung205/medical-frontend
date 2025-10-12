@@ -1,15 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     createCategory,
+  deleteCategory,
   getCategories,
+  getCategoriesOptions,
+  getCategory,
   updateCategory,
 } from "@/services/admin/categoryService";
 import { toast } from "@/hooks/use-toast";
 
-export const useCategories = (params?: any) => {
+export const useCategories = (params?: any, options?: any ) => {
   return useQuery({
     queryKey: ["categories", params],
     queryFn: () => getCategories(params),
+    select: (res: any) => res.data,
+    ...options,
+  });
+};
+
+export const useCategory = (id: number) => {
+  return useQuery({
+    queryKey: ["category", id],
+    queryFn: () => getCategory(id),
     select: (res) => res.data,
   });
 };
@@ -69,5 +81,43 @@ export const useCreateCategory = () => {
         description: "Tạo danh mục thất bại!",
       });
     },
+  });
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deleteCategory(id),
+
+    onSuccess: (res) => {
+      if (res.success) {
+        console.log("deleteCategory success:", res);
+        toast({
+          title: "Thành công",
+          description: "Xóa danh mục thành công!",
+        });
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+      }
+    },
+
+    onError: (error: any) => {
+      console.log('deleteCategory error:', error);
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Xóa danh mục thất bại!",
+      });
+    },
+  });
+};
+
+
+export const useGetCategoriesOptions = (params?: any, options?: any) => {
+  return useQuery({
+    queryKey: ["categoriesOptions", params],
+    queryFn: () => getCategoriesOptions(params),
+    select: (res) => res.data,
+    ...options,
   });
 };

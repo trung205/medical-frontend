@@ -39,7 +39,9 @@ interface ProductsTableProps {
   data: Product[]
 }
 
-export function ProductsTable({ data }: ProductsTableProps) {
+const LINK_API_URL = process.env.NEXT_PUBLIC_API_URL
+
+export function ProductsTable({ data, handleSearch, conditions }: any) {
   const router = useRouter()
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState("")
@@ -62,8 +64,8 @@ export function ProductsTable({ data }: ProductsTableProps) {
       accessorKey: "images",
       header: "Hình ảnh",
       cell: ({ row }) => {
-        const images = row.getValue("images") as string[]
-        const mainImage = images && images.length > 0 ? images[0] : "/placeholder.svg"
+        const images: any = row.getValue("images") as string[]
+        const mainImage = images && images.length > 0 ? `${LINK_API_URL}/products/${images[0].productId}/images/${images[0].id}` : "/placeholder.svg"
         return (
           <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-muted">
             <Image src={mainImage || "/placeholder.svg"} alt={row.original.name} fill className="object-cover" />
@@ -97,44 +99,13 @@ export function ProductsTable({ data }: ProductsTableProps) {
       ),
     },
     {
-      accessorKey: "categoryName",
+      accessorKey: "categoryLevel3",
       header: "Danh mục",
-      cell: ({ row }) => <Badge variant="secondary">{row.getValue("categoryName")}</Badge>,
-    },
-    {
-      accessorKey: "price",
-      header: ({ column }) => {
-        return (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Giá
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => {
-        const price = row.getValue("price") as number
-        const salePrice = row.original.salePrice
-        return (
-          <div>
-            {salePrice ? (
-              <>
-                <div className="font-medium text-destructive">{formatPrice(salePrice)}</div>
-                <div className="text-sm text-muted-foreground line-through">{formatPrice(price)}</div>
-              </>
-            ) : (
-              <div className="font-medium">{formatPrice(price)}</div>
-            )}
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "stock",
-      header: "Tồn kho",
-      cell: ({ row }) => {
-        const stock = row.getValue("stock") as number
-        return <Badge variant={stock > 5 ? "default" : stock > 0 ? "secondary" : "destructive"}>{stock} sản phẩm</Badge>
-      },
+      cell: ({ row }: any) => (
+        <Badge variant="secondary">
+          {row.getValue("categoryLevel3")?.name  || row.getValue("categoryLevel2")?.name || row.getValue("categoryLevel1")?.name || ''}
+        </Badge>
+      ),
     },
     {
       accessorKey: "status",
@@ -169,7 +140,7 @@ export function ProductsTable({ data }: ProductsTableProps) {
   ]
 
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -187,8 +158,8 @@ export function ProductsTable({ data }: ProductsTableProps) {
       <div className="flex items-center gap-4">
         <Input
           placeholder="Tìm kiếm sản phẩm..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
+          value={conditions?.search}
+          onChange={(e) => handleSearch(e.target.value)}
           className="max-w-sm"
         />
       </div>
@@ -196,7 +167,7 @@ export function ProductsTable({ data }: ProductsTableProps) {
       <div className="rounded-lg border border-border bg-card">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table?.getHeaderGroups()?.map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
@@ -207,8 +178,8 @@ export function ProductsTable({ data }: ProductsTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {table?.getRowModel()?.rows?.length ? (
+              table?.getRowModel()?.rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
