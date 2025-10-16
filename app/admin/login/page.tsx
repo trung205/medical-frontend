@@ -1,59 +1,56 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Shield, AlertCircle, Activity } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Shield, AlertCircle, Activity } from "lucide-react";
+import { useLogin } from "@/hooks/admin/useLogin";
 
 export default function AdminLoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const { mutate, isPending } = useLogin();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+  const [form, setForm] = useState({
+    email: "admin@ndbio.com",
+    password: "123456",
+  });
 
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-    if (email === "admin@medequip.vn" && password === "admin123") {
-      const mockToken = btoa(
-        JSON.stringify({
-          email,
-          role: "admin",
-          loginTime: Date.now(),
-        }),
-      )
-      localStorage.setItem("admin_token", mockToken)
-      localStorage.setItem(
-        "admin_user",
-        JSON.stringify({
-          email,
-          name: "Quản trị viên",
-          role: "admin",
-        }),
-      )
-
-      router.push("/admin")
-      router.refresh()
-    } else {
-      setError("Email hoặc mật khẩu không đúng")
-      setLoading(false)
-    }
-  }
-
+    mutate(form, {
+      onSuccess: (res) => {
+        if (res.success) {
+          router.push("/admin");
+        } else {
+          setError("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
+        }
+      },
+      onError: (error: any) => {
+        console.error("Login error:", error);
+        const msg =
+          error.response?.data?.message ||
+          "Đăng nhập thất bại. Vui lòng thử lại.";
+        setError(msg);
+      },
+    });
+  };
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Left side - Login form */}
       <div className="flex items-center justify-center p-8 bg-background">
         <Card className="w-full max-w-md border-0 shadow-none">
           <CardHeader className="space-y-4">
@@ -62,13 +59,19 @@ export default function AdminLoginPage() {
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">MedEquip Admin</h1>
-                <p className="text-sm text-muted-foreground">Hệ thống quản trị</p>
+                <h1 className="text-2xl font-bold text-foreground">
+                  MedEquip Admin
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Hệ thống quản trị
+                </p>
               </div>
             </div>
             <div>
               <CardTitle className="text-3xl font-bold">Đăng nhập</CardTitle>
-              <CardDescription className="mt-2">Nhập thông tin đăng nhập để truy cập trang quản trị</CardDescription>
+              <CardDescription className="mt-2">
+                Nhập thông tin đăng nhập để truy cập trang quản trị
+              </CardDescription>
             </div>
           </CardHeader>
           <CardContent>
@@ -88,10 +91,10 @@ export default function AdminLoginPage() {
                   id="email"
                   type="email"
                   placeholder="admin@medequip.vn"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
-                  disabled={loading}
+                  disabled={isPending}
                   className="h-11"
                 />
               </div>
@@ -104,23 +107,32 @@ export default function AdminLoginPage() {
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
                   required
-                  disabled={loading}
+                  disabled={isPending}
                   className="h-11"
                 />
               </div>
 
-              <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
-                {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+              <Button
+                type="submit"
+                className="w-full h-11 text-base"
+                disabled={isPending}
+              >
+                {isPending ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
 
               <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
-                <p className="text-sm font-medium mb-2 text-foreground">Thông tin đăng nhập demo:</p>
+                <p className="text-sm font-medium mb-2 text-foreground">
+                  Thông tin đăng nhập demo:
+                </p>
                 <div className="space-y-1 text-sm text-muted-foreground">
                   <p>
-                    <span className="font-medium">Email:</span> admin@medequip.vn
+                    <span className="font-medium">Email:</span>{" "}
+                    admin@medequip.vn
                   </p>
                   <p>
                     <span className="font-medium">Mật khẩu:</span> admin123
@@ -140,9 +152,12 @@ export default function AdminLoginPage() {
             <Shield className="w-10 h-10 text-white" />
           </div>
           <div className="space-y-3">
-            <h2 className="text-4xl font-bold text-white">Quản lý thiết bị y tế</h2>
+            <h2 className="text-4xl font-bold text-white">
+              Quản lý thiết bị y tế
+            </h2>
             <p className="text-lg text-white/80">
-              Hệ thống quản trị toàn diện cho việc quản lý sản phẩm, danh mục và nội dung blog
+              Hệ thống quản trị toàn diện cho việc quản lý sản phẩm, danh mục và
+              nội dung blog
             </p>
           </div>
           <div className="grid grid-cols-3 gap-4 pt-8">
@@ -162,5 +177,5 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

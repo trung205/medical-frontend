@@ -1,45 +1,74 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-import { useEffect, useState } from "react"
-import { Upload, X, Save } from "lucide-react"
-import Image from "next/image"
-import { RichTextEditor } from "@/components/admin/rich-text-editor"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { Upload, X, Save } from "lucide-react";
+import Image from "next/image";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
+// import { TagSelector } from "../ui/tag-selector";
+import { MultiSelectTagField } from "../ui/multi-select-tag-field";
+import { TagSelector } from "@/components/admin/tag-selector"
+import { getImageBlog } from "@/utils/images";
 
 const blogSchema = z.object({
-  title: z.string().min(1, "Tiêu đề là bắt buộc").max(200, "Tiêu đề không được quá 200 ký tự"),
+  title: z
+    .string()
+    .min(1, "Tiêu đề là bắt buộc")
+    .max(200, "Tiêu đề không được quá 200 ký tự"),
   slug: z
     .string()
     .min(1, "Slug là bắt buộc")
-    .regex(/^[a-z0-9-]+$/, "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"),
-  excerpt: z.string().min(1, "Mô tả ngắn là bắt buộc").max(300, "Mô tả ngắn không được quá 300 ký tự"),
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"
+    ),
+  excerpt: z.string().min(1, "Mô tả ngắn là bắt buộc"),
   content: z.string().min(1, "Nội dung là bắt buộc"),
   author: z.string().min(1, "Tên tác giả là bắt buộc"),
   status: z.enum(["draft", "published"]),
-  featured: z.boolean(),
-  image: z.string().min(1, "Hình ảnh là bắt buộc"),
-})
+  isFeatured: z.boolean(),
+  thumbnail: z.any().optional(),
+  imageUpdate: z.any().optional(),
+  tags: z.array(z.object({
+    id: z.number(),
+    name: z.string(),
+  })),
+});
 
-type BlogFormData = z.infer<typeof blogSchema>
+type BlogFormData = z.infer<typeof blogSchema>;
 
 interface BlogEditorProps {
-  blog?: any
-  onSave: (data: BlogFormData) => void
+  blog?: any;
+  onSave: (data: BlogFormData) => void;
 }
 
 export function BlogEditor({ blog, onSave }: BlogEditorProps) {
-  const [imagePreview, setImagePreview] = useState<string>("")
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const form = useForm<BlogFormData>({
     resolver: zodResolver(blogSchema),
@@ -50,10 +79,12 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
       content: "",
       author: "",
       status: "draft",
-      featured: false,
-      image: "",
+      isFeatured: false,
+      thumbnail: undefined,
+      tags: [],
+      imageUpdate: undefined,
     },
-  })
+  });
 
   useEffect(() => {
     if (blog) {
@@ -64,16 +95,18 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
         content: blog.content,
         author: blog.author,
         status: blog.status,
-        featured: blog.featured,
-        image: blog.image,
-      })
-      setImagePreview(blog.image)
+        isFeatured: blog.isFeatured,
+        thumbnail: blog.thumbnail,
+        tags: blog.tags || [],
+        imageUpdate: undefined,
+      });
+      setImagePreview(getImageBlog(blog?.thumbnail?.id) || "");
     }
-  }, [blog, form])
+  }, [blog, form]);
 
   const onSubmit = (data: BlogFormData) => {
-    onSave(data)
-  }
+    onSave(data);
+  };
 
   // Auto generate slug from title
   const handleTitleChange = (value: string) => {
@@ -85,23 +118,28 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
-      .trim()
-    form.setValue("slug", slug)
-  }
+      .trim();
+    form.setValue("slug", slug);
+  };
 
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string
-        setImagePreview(result)
-        form.setValue("image", result)
-      }
-      reader.readAsDataURL(file)
+        const result = reader.result as string;
+        setImagePreview(result);
+        const thumbnailData = form.getValues("thumbnail");
+        if (thumbnailData && thumbnailData.id) {
+          form.setValue("imageUpdate", { id: thumbnailData.id, data: file });
+        } else {
+          form.setValue("imageUpdate", file);
+        }
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -123,8 +161,8 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                           className="text-lg"
                           {...field}
                           onChange={(e) => {
-                            field.onChange(e)
-                            handleTitleChange(e.target.value)
+                            field.onChange(e);
+                            handleTitleChange(e.target.value);
                           }}
                         />
                       </FormControl>
@@ -142,11 +180,15 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                       <FormControl>
                         <Input placeholder="slug-bai-viet" {...field} />
                       </FormControl>
-                      <FormDescription>URL thân thiện cho bài viết (tự động tạo từ tiêu đề)</FormDescription>
+                      <FormDescription>
+                        URL thân thiện cho bài viết (tự động tạo từ tiêu đề)
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                
 
                 <FormField
                   control={form.control}
@@ -155,9 +197,15 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                     <FormItem>
                       <FormLabel>Mô tả ngắn</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Nhập mô tả ngắn về bài viết" rows={3} {...field} />
+                        <Textarea
+                          placeholder="Nhập mô tả ngắn về bài viết"
+                          rows={3}
+                          {...field}
+                        />
                       </FormControl>
-                      <FormDescription>Hiển thị trong danh sách bài viết và kết quả tìm kiếm</FormDescription>
+                      <FormDescription>
+                        Hiển thị trong danh sách bài viết và kết quả tìm kiếm
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -174,7 +222,10 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                     <FormItem>
                       <FormLabel>Nội dung bài viết</FormLabel>
                       <FormControl>
-                        <RichTextEditor value={field.value} onChange={field.onChange} />
+                        <RichTextEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -194,7 +245,10 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Trạng thái</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Chọn trạng thái" />
@@ -226,15 +280,20 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
 
                 <FormField
                   control={form.control}
-                  name="featured"
+                  name="isFeatured"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between rounded-lg border p-3">
                       <div className="space-y-0.5">
                         <FormLabel>Bài viết nổi bật</FormLabel>
-                        <FormDescription className="text-xs">Hiển thị trên trang chủ</FormDescription>
+                        <FormDescription className="text-xs">
+                          Hiển thị trên trang chủ
+                        </FormDescription>
                       </div>
                       <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -246,7 +305,26 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
               <CardContent className="pt-6">
                 <FormField
                   control={form.control}
-                  name="image"
+                  name="tags"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tags</FormLabel>
+                      <FormControl>
+                        <TagSelector value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormDescription>Thêm tags để phân loại bài viết</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <FormField
+                  control={form.control}
+                  name="imageUpdate"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Hình ảnh đại diện</FormLabel>
@@ -258,7 +336,7 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                                 src={imagePreview || "/placeholder.svg"}
                                 alt="Preview"
                                 fill
-                                className="object-cover"
+                                className="object-contain"
                               />
                               <Button
                                 type="button"
@@ -266,8 +344,8 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                                 size="icon"
                                 className="absolute top-2 right-2"
                                 onClick={() => {
-                                  setImagePreview("")
-                                  form.setValue("image", "")
+                                  setImagePreview("");
+                                  form.setValue("imageUpdate", null as any);
                                 }}
                               >
                                 <X className="w-4 h-4" />
@@ -276,8 +354,15 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
                           ) : (
                             <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
                               <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                              <span className="text-sm text-muted-foreground">Click để tải ảnh lên</span>
-                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                              <span className="text-sm text-muted-foreground">
+                                Click để tải ảnh lên
+                              </span>
+                              <input
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                              />
                             </label>
                           )}
                         </div>
@@ -297,5 +382,5 @@ export function BlogEditor({ blog, onSave }: BlogEditorProps) {
         </div>
       </form>
     </Form>
-  )
+  );
 }

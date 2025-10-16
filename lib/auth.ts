@@ -3,7 +3,7 @@
 // Mock authentication utilities
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false
-  const token = localStorage.getItem("admin_token")
+  const token = localStorage.getItem("adminToken")
   return !!token
 }
 
@@ -19,7 +19,7 @@ export function getAdminUser() {
 }
 
 export function logout() {
-  localStorage.removeItem("admin_token")
+  localStorage.removeItem("adminToken")
   localStorage.removeItem("admin_user")
   window.location.href = "/admin/login"
 }

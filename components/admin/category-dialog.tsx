@@ -1,74 +1,119 @@
-"use client"
+"use client";
 
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useEffect } from "react"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { ProductTypeSelector } from "./product-type-selector";
 
 const categorySchema = z.object({
-  name: z.string().min(1, "Tên danh mục là bắt buộc").max(100, "Tên danh mục không được quá 100 ký tự"),
+  name: z
+    .string()
+    .min(1, "Tên danh mục là bắt buộc")
+    .max(100, "Tên danh mục không được quá 100 ký tự"),
   slug: z
     .string()
     .min(1, "Slug là bắt buộc")
-    .regex(/^[a-z0-9-]+$/, "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"),
-  description: z.string().max(500, "Mô tả không được quá 500 ký tự"),
-  parentId: z.string().nullable(),
-})
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"
+    ),
+  productTypeId: z
+  .number({
+    required_error: "Vui lòng chọn loại sản phẩm",
+    invalid_type_error: "Loại sản phẩm không hợp lệ",
+  })
+  .min(1, { message: "Chọn loại sản phẩm" }),
+  // description: z.string().max(500, "Mô tả không được quá 500 ký tự"),
+  // parentId: z.string().nullable(),
+});
 
-type CategoryFormData = z.infer<typeof categorySchema>
-
-const mockCategories = [
-  { id: "1", name: "Thiết bị chẩn đoán hình ảnh", level: 1 },
-  { id: "2", name: "Máy siêu âm", level: 2, parentId: "1" },
-  { id: "7", name: "Thiết bị hồi sức", level: 1 },
-]
+type CategoryFormData = z.infer<typeof categorySchema>;
 
 interface CategoryDialogProps {
-  category?: any
-  parentCategory?: any
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  category?: any;
+  parentCategory?: any;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onHandleSubmitEdit: (data: any) => void;
+  onHandleSubmitCreate: (data: any) => void;
 }
 
-export function CategoryDialog({ category, parentCategory, open, onOpenChange }: CategoryDialogProps) {
+export function CategoryDialog({
+  category,
+  parentCategory,
+  open,
+  onOpenChange,
+  onHandleSubmitEdit,
+  onHandleSubmitCreate,
+}: CategoryDialogProps) {
+  const [initialProductTypeName, setInitialProductTypeName] = useState("");
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: "",
       slug: "",
-      description: "",
-      parentId: parentCategory?.id || null,
+      productTypeId: undefined,
+      // description: "",
+      // parentId: parentCategory?.id || null,
     },
-  })
+  });
 
   useEffect(() => {
     if (category) {
       form.reset({
         name: category.name,
         slug: category.slug,
-        description: category.description,
-        parentId: category.parentId,
-      })
+        productTypeId: category.productTypeId,
+        // description: category.description,
+        // parentId: category.parentId,
+      });
+      setInitialProductTypeName(category?.productType?.name || "");
     } else {
       form.reset({
         name: "",
         slug: "",
-        description: "",
-        parentId: parentCategory?.id || null,
-      })
+        productTypeId: undefined,
+        // description: "",
+        // parentId: parentCategory?.id || null,
+      });
     }
-  }, [category, parentCategory, form])
+  }, [category, parentCategory, form]);
 
   const onSubmit = (data: CategoryFormData) => {
-    console.log("[v0] Category data:", data)
-    onOpenChange(false)
-  }
+    console.log("[v0] Category data:", data);
+    if (category?.id) {
+      onHandleSubmitEdit({ id: category?.id || "", ...data });
+    } else {
+      onHandleSubmitCreate({ ...data });
+    }
+    onOpenChange(false);
+  };
 
   const handleNameChange = (value: string) => {
     const slug = value
@@ -79,17 +124,21 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
-      .trim()
-    form.setValue("slug", slug)
-  }
+      .trim();
+    form.setValue("slug", slug);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{category ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}</DialogTitle>
+          <DialogTitle>
+            {category ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
+          </DialogTitle>
           <DialogDescription>
-            {category ? "Cập nhật thông tin danh mục" : "Tạo danh mục mới cho hệ thống"}
+            {category
+              ? "Cập nhật thông tin danh mục"
+              : "Tạo danh mục mới cho hệ thống"}
           </DialogDescription>
         </DialogHeader>
 
@@ -106,8 +155,8 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
                       placeholder="Nhập tên danh mục"
                       {...field}
                       onChange={(e) => {
-                        field.onChange(e)
-                        handleNameChange(e.target.value)
+                        field.onChange(e);
+                        handleNameChange(e.target.value);
                       }}
                     />
                   </FormControl>
@@ -132,6 +181,27 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
 
             <FormField
               control={form.control}
+              name="productTypeId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Loại sản phẩm</FormLabel>
+                  <FormControl>
+                    <ProductTypeSelector
+                      value={field.value}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        setInitialProductTypeName("");
+                      }}
+                      initialName={initialProductTypeName}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* <FormField
+              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
@@ -142,9 +212,9 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="parentId"
               render={({ field }) => (
@@ -170,11 +240,17 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <div className="flex items-center gap-3 pt-4">
-              <Button type="submit">{category ? "Cập nhật" : "Tạo danh mục"}</Button>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="submit">
+                {category ? "Cập nhật" : "Tạo danh mục"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Hủy
               </Button>
             </div>
@@ -182,5 +258,5 @@ export function CategoryDialog({ category, parentCategory, open, onOpenChange }:
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
