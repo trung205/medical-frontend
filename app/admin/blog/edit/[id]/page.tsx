@@ -1,7 +1,12 @@
 "use client";
 
 import { BlogEditor } from "@/components/admin/blog-editor";
-import { useBlog, useUpdateBlog } from "@/hooks/admin/useBlogs";
+import {
+  useBlog,
+  useCreateMultipleBlogImages,
+  useUpdateBlog,
+  useUpdateBlogImages,
+} from "@/hooks/admin/useBlogs";
 import { useRouter } from "next/navigation";
 
 export default function EditBlogPage({ params }: { params: { id: string } }) {
@@ -11,18 +16,53 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
 
   const { data: blog } = useBlog(Number(id));
   const { mutate: mutateUpdate } = useUpdateBlog();
+  const { mutate: createBlogImages } = useCreateMultipleBlogImages();
+  const { mutate: mutateUpdateThumbnail } = useUpdateBlogImages();
 
   const handleSave = (data: any) => {
-    console.log("[v0] Updating blog post:", data);
+    const { tags, thumbnail, imageUpdate, ...rest } = data;
+    const formatTags = tags?.map((tag: any) => tag.id) || [];
     mutateUpdate(
       {
         id: Number(id),
-        payload: data,
+        payload: {
+          ...rest,
+          tags: formatTags,
+        },
       },
       {
         onSuccess: (res: any) => {
           if (res.success) {
-            router.push("/admin/blog");
+            if (!imageUpdate) {
+              router.push("/admin/blog");
+              return;
+            }
+
+            if (thumbnail && thumbnail.id) {
+              mutateUpdateThumbnail(
+                {
+                  images: [imageUpdate],
+                },
+                {
+                  onSuccess: (res: any) => {
+                    console.log("[v0] Updated blog thumbnail:", res);
+                    router.push("/admin/blog");
+                  },
+                }
+              );
+            } else {
+              createBlogImages(
+                {
+                  blogId: Number(id),
+                  images: [imageUpdate],
+                },
+                {
+                  onSuccess: (res: any) => {
+                    router.push("/admin/blog");
+                  },
+                }
+              );
+            }
           }
         },
       }

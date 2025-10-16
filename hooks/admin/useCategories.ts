@@ -117,7 +117,7 @@ export const useGetCategoriesOptions = (params?: any, options?: any) => {
   return useQuery({
     queryKey: ["categoriesOptions", params],
     queryFn: () => getCategoriesOptions(params),
-    select: (res) => res.data,
+    select: (res: any) => res.data,
     ...options,
   });
 };

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { createBlog, deleteBlog, getBlog, getBlogs, updateBlog } from "@/services/admin/blogService";
+import { createBlog, createBlogImage, deleteBlog, getBlog, getBlogs, updateBlog, updateBlogImage } from "@/services/admin/blogService";
 
 export const useBlogs = (params?: any, options?: any ) => {
   return useQuery({
@@ -102,6 +102,62 @@ export const useDeleteBlog = () => {
         variant: "destructive",
         title: "Lỗi",
         description: "Xóa bài viết thất bại!",  
+      });
+    },
+  });
+};
+export const useCreateMultipleBlogImages = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ blogId, images }: { blogId: number; images: any[] }) => {
+      const promises = images.map((file) =>
+        createBlogImage(blogId, file)
+      );
+
+      return Promise.all(promises);
+    },
+
+    onSuccess: (results) => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+    },
+    
+
+    onError: (error: any) => {
+      console.log("createMultipleBlogImages error:", error);
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Tạo hình ảnh bài viết thất bại!",
+      });
+    },
+  });
+};
+
+export const useUpdateBlogImages = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({images}: any) => {
+      console.log("images:", images);
+      const promises = images.map((file: any) =>
+        updateBlogImage(file.id, file.data)
+      );
+
+      return Promise.all(promises);
+    },
+
+    onSuccess: (results) => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+    },
+    
+
+    onError: (error: any) => {
+      console.log("createMultipleBlogImages error:", error);
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Tạo hình ảnh bài viết thất bại!",
       });
     },
   });

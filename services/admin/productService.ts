@@ -42,3 +42,8 @@ export const createProductImage = async (
   });
   return response.data;
 };
+
+export const deleteProductImage = async (id: number) => {
+  const res = await adminApi.delete(`/products/images/${id}`);
+  return res.data;
+};

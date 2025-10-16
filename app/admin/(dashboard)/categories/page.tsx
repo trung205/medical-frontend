@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronRight, Pencil, Trash2, FolderOpen } from "lucide-react";
+import {
+  Plus,
+  ChevronRight,
+  Pencil,
+  Trash2,
+  FolderOpen,
+  ChevronDown,
+  Check,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -20,30 +28,40 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CategoryDialog } from "@/components/admin/category-dialog";
-import { useCategories, useCreateCategory, useUpdateCategory } from "@/hooks/admin/useCategories";
+import {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+} from "@/hooks/admin/useCategories";
 import { CommonPagination } from "@/components/ui/common-pagination";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { useProductTypes } from "@/hooks/admin/useProductTypes";
+import { any } from "zod";
+import { useDebounce } from "@/hooks/common/useDebounce";
+import { ProductTypeSelector } from "@/components/admin/product-type-selector";
 
 export default function CategoriesPage() {
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const [condition, setCondition] = useState({
+  const [conditions, setConditions] = useState({
     search: "",
     level: 1,
+    productTypeId: "",
   });
+  const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
+  const [editingCategory, setEditingCategory] = useState<any | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const debouncedSearch = useDebounce(conditions.search, 500);
+
   const { data, isLoading, isError }: any = useCategories({
     page,
-    search: condition.search,
-    level: condition.level,
+    search: debouncedSearch,
+    level: conditions.level,
+    productTypeId: conditions.productTypeId,
   });
   const { mutate: mutateUpdate, isPending: isUpdating } = useUpdateCategory();
   const { mutate: mutateCreate, isPending: isCreating } = useCreateCategory();
-
-  const [selectedCategory, setSelectedCategory] = useState<any | null>(
-    null
-  );
-  const [editingCategory, setEditingCategory] = useState<any | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: categories = [], pagination = {} } = data || {};
   const { totalPages, total } = pagination || {};
@@ -78,6 +96,7 @@ export default function CategoriesPage() {
       payload: data,
     });
   };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -91,12 +110,52 @@ export default function CategoriesPage() {
           Thêm danh mục
         </Button>
       </div>
+      <div className="flex items-center justify-between gap-4">
+        <Input
+          placeholder="Tìm kiếm sản phẩm..."
+          value={conditions?.search}
+          onChange={(e) =>
+            setConditions({ ...conditions, search: e.target.value })
+          }
+          className="max-w-sm pr-10
+              border-gray-300
+              bg-white
+              dark:bg-zinc-900
+              dark:border-zinc-700
+              shadow-sm
+              hover:border-gray-400
+              focus:border-primary
+              focus:ring-2
+              focus:ring-primary/40
+              transition-all
+              duration-200"
+        />
+        <ProductTypeSelector
+          value={conditions.productTypeId}
+          onChange={(productTypeId: any) =>
+            setConditions({ ...conditions, productTypeId })
+          }
+          inputClassName="
+            pr-10
+            border-gray-300
+            bg-white
+            dark:bg-zinc-900
+            dark:border-zinc-700
+            shadow-sm
+            hover:border-gray-400
+            focus:border-primary
+            focus:ring-2
+            focus:ring-primary/40
+            transition-all
+            duration-200
+            min-w-sm
+          "
+        />
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            Danh mục cấp 1
-          </CardTitle>
+          <CardTitle>Danh mục cấp 1</CardTitle>
           <CardDescription>{total} danh mục</CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,7 +195,9 @@ export default function CategoriesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => router.push(`/admin/categories/${category.id}`)}
+                          onClick={() =>
+                            router.push(`/admin/categories/${category.id}`)
+                          }
                           className="text-primary"
                         >
                           {category.children.length} danh mục

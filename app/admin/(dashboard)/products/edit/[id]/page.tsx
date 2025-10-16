@@ -32,15 +32,23 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft, Upload, X } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Upload, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import { useProduct, useUpdateProduct } from "@/hooks/admin/useProducts";
+import {
+  useCreateMultipleProductImages,
+  useProduct,
+  useRemoveMultipleProductImages,
+  useUpdateProduct,
+} from "@/hooks/admin/useProducts";
 import {
   useCategories,
   useGetCategoriesOptions,
 } from "@/hooks/admin/useCategories";
+import { getImageProduct } from "@/utils/images";
+import { ProductTypeSelector } from "@/components/admin/product-type-selector";
+import { Textarea } from "@/components/ui/textarea";
 
 const productSchema = z.object({
   name: z
@@ -57,17 +65,26 @@ const productSchema = z.object({
   sku: z.string().min(1, "Mã SKU là bắt buộc"),
   summary: z.string(),
   description: z.string(),
-  specifications: z.string(),
   origin: z.string(),
   categoryLevel1Id: z.string().min(1, "Danh mục cấp 1 là bắt buộc"),
-  categoryLevel2Id: z.string().min(1, "Danh mục cấp 2 là bắt buộc"),
-  categoryLevel3Id: z.string().min(1, "Danh mục cấp 3 là bắt buộc"),
-  status: z.enum(["active", "inactive"]),
+  categoryLevel2Id: z.string().optional(),
+  categoryLevel3Id: z.string().optional(),
+  // status: z.enum(["active", "inactive"]),
+  status: z.string().optional(),
   isFeatured: z.boolean(),
+  productTypeId: z
+    .number({
+      required_error: "Vui lòng chọn loại sản phẩm",
+      invalid_type_error: "Loại sản phẩm không hợp lệ",
+    })
+    .min(1, { message: "Chọn loại sản phẩm" }),
+  imagesUpdate: z
+    .array(z.any()),
   images: z
-    .array(z.string())
-    .min(1, "Cần ít nhất 1 hình ảnh")
-    .max(5, "Tối đa 5 hình ảnh"),
+    .array(z.any()),
+  specifications: z
+    .array(z.object({ key: z.string(), value: z.string() }))
+    .optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -76,10 +93,17 @@ export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
   const productId = params.id as string;
+  const [initialProductTypeName, setInitialProductTypeName] = useState("");
+
   const [isInitialLoad, setIsInitialLoad] = useState({
+    categoryLevel1Id: true,
     categoryLevel2Id: true,
     categoryLevel3Id: true,
   });
+
+  const [specifications, setSpecifications] = useState<
+    Array<{ key: string; value: string }>
+  >([{ key: "", value: "" }]);
 
   const {
     data: product,
@@ -87,13 +111,10 @@ export default function EditProductPage() {
     error,
   }: any = useProduct(Number(productId));
   const { mutate: mutateUpdate, isPending: isUpdating } = useUpdateProduct();
+  const { mutate: createProductImages } = useCreateMultipleProductImages();
+  const { mutate: deleteProductImage } = useRemoveMultipleProductImages();
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-
-  const { data: level1Categories, isLoading: isLoadingLevel1 }: any =
-    useCategories({
-      level: 1,
-    });
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -103,22 +124,37 @@ export default function EditProductPage() {
       sku: "",
       summary: "",
       description: "",
-      specifications: "",
       origin: "",
       categoryLevel1Id: "",
       categoryLevel2Id: "",
       categoryLevel3Id: "",
       status: "active",
       isFeatured: false,
-      images: ["2", "3", "4", "5", "6"],
+      images: [],
+      productTypeId: undefined,
+      specifications: [{ key: "", value: "" }],
     },
   });
+
+  console.log("form error:", form.formState.errors)
+  console.log("form values:", form.getValues());
+
+  const { data: level1Categories, isLoading: isLoadingLevel1 }: any =
+    useCategories(
+      {
+        level: 1,
+        productTypeId: form.getValues("productTypeId"),
+      },
+      {
+        enabled: !!form.getValues("productTypeId"),
+      }
+    );
 
   const { data: level2Categories, isLoading: isLoadingLevel2 }: any =
     useCategories(
       {
         level: 2,
-        parentId: form.getValues("categoryLevel1Id"), 
+        parentId: form.getValues("categoryLevel1Id"),
       },
       {
         enabled: !!form.getValues("categoryLevel1Id"),
@@ -137,24 +173,82 @@ export default function EditProductPage() {
     );
 
   const onSubmit = (data: ProductFormData) => {
+    // const { images, imagesUpdate, ...payload } = {
+    //   ...data,
+    //   categoryLevel1Id: Number(data.categoryLevel1Id),
+    //   ...(data.categoryLevel2Id && {
+    //     categoryLevel2Id: Number(data.categoryLevel2Id),
+    //   }),
+    //   ...(data.categoryLevel3Id && {
+    //     categoryLevel3Id: Number(data.categoryLevel3Id),
+    //   }),
+    // };
+
+    const {
+      images,
+      imagesUpdate,
+      categoryLevel2Id,
+      categoryLevel3Id,
+      ...rest
+    } = data;
     const payload = {
-      ...data,
-      categoryLevel1Id: Number(data.categoryLevel1Id),
-      categoryLevel2Id: Number(data.categoryLevel2Id),
-      categoryLevel3Id: Number(data.categoryLevel3Id),
+      ...rest,
+      categoryLevel1Id: Number(rest.categoryLevel1Id),
+      ...(categoryLevel2Id && {
+        categoryLevel2Id: Number(categoryLevel2Id),
+      }),
+      ...(categoryLevel3Id && {
+        categoryLevel3Id: Number(categoryLevel3Id),
+      }),
     };
+
+    const listImageRemove = images.filter(
+      (item: any) =>
+        !imagesUpdate.some((updateItem: any) => updateItem?.id === item?.id)
+    );
+    const listImageAdd = imagesUpdate.filter(
+      (item: any) =>
+        !images.some((updateItem: any) => updateItem?.id === item?.id)
+    );
+
+    if (listImageRemove.length > 0) {
+      deleteProductImage(
+        {
+          images: listImageRemove,
+        },
+        {
+          onSuccess: (data) => {
+            console.log("data:", data);
+          },
+        }
+      );
+    }
+
+    if (listImageAdd.length > 0) {
+      createProductImages(
+        {
+          productId: Number(productId),
+          images: listImageAdd,
+        },
+        {
+          onSuccess: (data) => {
+            console.log("data:", data);
+          },
+        }
+      );
+    }
+
     mutateUpdate(
       {
         id: Number(productId),
         payload,
       },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
           router.push("/admin/products");
         },
       }
     );
-    router.push("/admin/products");
   };
 
   const handleNameChange = (value: string) => {
@@ -172,7 +266,7 @@ export default function EditProductPage() {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const currentImages = form.getValues("images");
+    const currentImages = form.getValues("imagesUpdate");
 
     if (currentImages.length + files.length > 5) {
       alert("Tối đa 5 hình ảnh");
@@ -184,7 +278,10 @@ export default function EditProductPage() {
       reader.onloadend = () => {
         const result = reader.result as string;
         setImagePreviews((prev) => [...prev, result]);
-        form.setValue("images", [...form.getValues("images"), result]);
+        form.setValue("imagesUpdate", [
+          ...form.getValues("imagesUpdate"),
+          file,
+        ]);
       };
       reader.readAsDataURL(file);
     });
@@ -192,9 +289,19 @@ export default function EditProductPage() {
 
   const removeImage = (index: number) => {
     const newPreviews = imagePreviews.filter((_, i) => i !== index);
-    const newImages = form.getValues("images").filter((_, i) => i !== index);
+    const newImages = form
+      .getValues("imagesUpdate")
+      .filter((_, i) => i !== index);
     setImagePreviews(newPreviews);
-    form.setValue("images", newImages);
+    form.setValue("imagesUpdate", newImages);
+  };
+
+  const handleProductTypeChange = (value: number) => {
+    form.setValue("productTypeId", value);
+    form.setValue("categoryLevel1Id", "");
+    form.setValue("categoryLevel2Id", "");
+    form.setValue("categoryLevel3Id", "");
+    setInitialProductTypeName("");
   };
 
   const handleCategory1Change = (value: string) => {
@@ -235,26 +342,81 @@ export default function EditProductPage() {
     );
   }, [level3Categories]);
 
+  const addSpecification = () => {
+    const newSpecs = [...specifications, { key: "", value: "" }];
+    setSpecifications(newSpecs);
+    form.setValue("specifications", newSpecs);
+  };
+
+  const removeSpecification = (index: number) => {
+    const newSpecs = specifications.filter((_, i) => i !== index);
+    setSpecifications(newSpecs);
+    form.setValue("specifications", newSpecs);
+  };
+
+  const updateSpecification = (
+    index: number,
+    field: "key" | "value",
+    value: string
+  ) => {
+    const newSpecs = [...specifications];
+    newSpecs[index][field] = value;
+    setSpecifications(newSpecs);
+    form.setValue("specifications", newSpecs);
+  };
+
   useEffect(() => {
     if (product) {
-      const {
-        images,
-        ...rest
-      } = product;
-      console.log("rest:", rest);
+      const { images, specifications, ...rest } = product;
       form.reset({
         ...rest,
-        categoryLevel1Id: rest.categoryLevel1Id.toString(),
-        categoryLevel2Id: rest.categoryLevel2Id.toString(),
-        categoryLevel3Id: rest.categoryLevel3Id.toString(),
+        ...(rest.categoryLevel1Id && {
+          categoryLevel1Id: rest.categoryLevel1Id?.toString(),
+        }),
+        ...(rest.categoryLevel2Id && {
+          categoryLevel2Id: rest.categoryLevel2Id?.toString(),
+        }),
+        ...(rest.categoryLevel3Id && {
+          categoryLevel3Id: rest.categoryLevel3Id?.toString(),
+        }),
+        imagesUpdate: images,
+        images: images,
+        status: product?.status || 'active',
+        ...(specifications && {
+          specifications: JSON.parse(specifications),
+        })
       });
+      if (images && images.length > 0) {
+        setImagePreviews(images.map((item: any) => getImageProduct(item)));
+      }
+      if (product?.productType?.name) {
+        setInitialProductTypeName(product?.productType?.name);
+      }
+      if (specifications && specifications.length > 0) {
+        setSpecifications(JSON.parse(specifications));
+      }
     }
   }, [product, form]);
 
   useEffect(() => {
-    if (level2CategoriesOption.length > 0 && isInitialLoad.categoryLevel2Id) {
+    if (level1CategoriesOption.length > 0 && isInitialLoad.categoryLevel1Id) {
+      form.setValue(
+        "categoryLevel1Id",
+        product?.categoryLevel1Id?.toString() || ""
+      );
+      setIsInitialLoad({
+        ...isInitialLoad,
+        categoryLevel1Id: false,
+      });
+    }
+  }, [level1CategoriesOption]);
 
-      form.setValue("categoryLevel2Id", product.categoryLevel2Id.toString() || "");
+  useEffect(() => {
+    if (level2CategoriesOption.length > 0 && isInitialLoad.categoryLevel2Id) {
+      form.setValue(
+        "categoryLevel2Id",
+        product?.categoryLevel2Id?.toString() || ""
+      );
       setIsInitialLoad({
         ...isInitialLoad,
         categoryLevel2Id: false,
@@ -264,7 +426,10 @@ export default function EditProductPage() {
 
   useEffect(() => {
     if (level3CategoriesOption.length > 0 && isInitialLoad.categoryLevel3Id) {
-      form.setValue("categoryLevel3Id", product.categoryLevel3Id.toString() || "");
+      form.setValue(
+        "categoryLevel3Id",
+        product?.categoryLevel3Id?.toString() || ""
+      );
       setIsInitialLoad({
         ...isInitialLoad,
         categoryLevel3Id: false,
@@ -356,6 +521,28 @@ export default function EditProductPage() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="productTypeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Loại sản phẩm</FormLabel>
+                      <FormControl>
+                        <ProductTypeSelector
+                          value={field.value}
+                          // onChange={(e) => {
+                          //   console.log(e);
+                          //   field.onChange(e);
+                          //   setInitialProductTypeName("");
+                          // }}
+                          onChange={handleProductTypeChange}
+                          initialName={initialProductTypeName}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
@@ -369,12 +556,7 @@ export default function EditProductPage() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue
-                              placeholder={
-                                product?.categoryLevel1.name ||
-                                "Chọn danh mục cấp 1"
-                              }
-                            />
+                            <SelectValue placeholder={"Chọn danh mục cấp 1"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -414,12 +596,7 @@ export default function EditProductPage() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue
-                              placeholder={
-                               
-                                "Chọn danh mục cấp 2"
-                              }
-                            />
+                            <SelectValue placeholder={"Chọn danh mục cấp 2"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -459,12 +636,7 @@ export default function EditProductPage() {
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue
-                              placeholder={
-                              
-                                "Chọn danh mục cấp 3"
-                              }
-                            />
+                            <SelectValue placeholder={"Chọn danh mục cấp 3"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -486,6 +658,24 @@ export default function EditProductPage() {
                           )}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="summary"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Mô tả ngắn</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Nhập mô tả ngắn về sản phẩm (tối đa 500 ký tự)"
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -539,7 +729,7 @@ export default function EditProductPage() {
 
                 <FormField
                   control={form.control}
-                  name="images"
+                  name="imagesUpdate"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
                       <FormLabel>Hình ảnh sản phẩm (Tối đa 5 ảnh)</FormLabel>
@@ -553,13 +743,10 @@ export default function EditProductPage() {
                                   className="relative aspect-square rounded-lg overflow-hidden border"
                                 >
                                   <Image
-                                    src={
-                                      "https://drive.google.com/uc?id=1ft2e93J8EV5jmiWD-Pp4agjLm8dZFbCs" ||
-                                      "/placeholder.svg"
-                                    }
+                                    src={preview || "/placeholder.svg"}
                                     alt={`Preview ${index + 1}`}
                                     fill
-                                    className="object-cover"
+                                    className="object-contain"
                                   />
                                   <Button
                                     type="button"
@@ -620,22 +807,58 @@ export default function EditProductPage() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="specifications"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
+                <div className="col-span-2 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
                       <FormLabel>Thông số kỹ thuật</FormLabel>
-                      <FormControl>
-                        <RichTextEditor
-                          value={field.value}
-                          onChange={field.onChange}
+                      <FormDescription>
+                        Thêm các thông số kỹ thuật của sản phẩm
+                      </FormDescription>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addSpecification}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Thêm thông số
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {specifications.length > 0 && specifications?.map((spec, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <Input
+                          placeholder="Tên thông số (VD: Công suất)"
+                          value={spec.key}
+                          onChange={(e) =>
+                            updateSpecification(index, "key", e.target.value)
+                          }
+                          className="flex-1"
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <Input
+                          placeholder="Giá trị (VD: 1000W)"
+                          value={spec.value}
+                          onChange={(e) =>
+                            updateSpecification(index, "value", e.target.value)
+                          }
+                          className="flex-1"
+                        />
+                        {specifications.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeSpecification(index)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">

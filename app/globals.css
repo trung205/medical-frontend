@@ -136,3 +136,18 @@
  font-weight: 400;
  text-align: left;
 }
+
+.tiptap ul {
+  list-style: disc !important; /* Dấu chấm tròn */
+  padding-left: 1.5em !important;
+}
+
+.tiptap ol {
+  list-style: decimal !important; /* Số thứ tự */
+  padding-left: 1.5em !important;
+}
+
+img, video {
+  max-width: 100% !important;
+  height: auto;
+}

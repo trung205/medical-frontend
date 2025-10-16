@@ -18,6 +18,8 @@ import { Pencil, Trash2, ArrowUpDown, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { getImageProduct } from "@/utils/images"
+import { ProductTypeSelector } from "./product-type-selector"
 
 type Product = {
   id: string
@@ -65,7 +67,7 @@ export function ProductsTable({ data, handleSearch, conditions }: any) {
       header: "Hình ảnh",
       cell: ({ row }) => {
         const images: any = row.getValue("images") as string[]
-        const mainImage = images && images.length > 0 ? `${LINK_API_URL}/products/${images[0].productId}/images/${images[0].id}` : "/placeholder.svg"
+        const mainImage = images && images.length > 0 ? getImageProduct(images[0]) : "/placeholder.svg"
         return (
           <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-muted">
             <Image src={mainImage || "/placeholder.svg"} alt={row.original.name} fill className="object-cover" />
@@ -90,11 +92,11 @@ export function ProductsTable({ data, handleSearch, conditions }: any) {
       },
       cell: ({ row }) => (
         <div>
-          <div className="font-medium flex items-center gap-2">
+          <div className="font-medium flex items-center gap-2 truncate">
             {row.getValue("name")}
             {row.original.featured && <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />}
           </div>
-          <div className="text-sm text-muted-foreground">{row.original.sku}</div>
+          <div className="text-sm text-muted-foreground truncate">{row.original.sku}</div>
         </div>
       ),
     },
@@ -155,12 +157,44 @@ export function ProductsTable({ data, handleSearch, conditions }: any) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-4">
         <Input
           placeholder="Tìm kiếm sản phẩm..."
           value={conditions?.search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="max-w-sm"
+          onChange={(e) => handleSearch("search", e.target.value)}
+          className="max-w-sm pr-10
+              border-gray-300
+              bg-white
+              dark:bg-zinc-900
+              dark:border-zinc-700
+              shadow-sm
+              hover:border-gray-400
+              focus:border-primary
+              focus:ring-2
+              focus:ring-primary/40
+              transition-all
+              duration-200"
+        />
+        <ProductTypeSelector
+          value={conditions.productTypeId}
+          onChange={(productTypeId: any) =>
+            handleSearch("productTypeId", productTypeId)
+          }
+          inputClassName="
+            pr-10
+            border-gray-300
+            bg-white
+            dark:bg-zinc-900
+            dark:border-zinc-700
+            shadow-sm
+            hover:border-gray-400
+            focus:border-primary
+            focus:ring-2
+            focus:ring-primary/40
+            transition-all
+            duration-200
+            min-w-sm
+          "
         />
       </div>
 

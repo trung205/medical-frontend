@@ -3,13 +3,19 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Package, FileText, FolderTree, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, FileText, FolderTree, Settings, LogOut, ChevronDown, Box } from "lucide-react"
+import { useState } from "react"
 
 const menuItems = [
   {
     title: "Tổng quan",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Loại sản phẩm",
+    href: "/admin/product-types",
+    icon: Box,
   },
   {
     title: "Danh mục",
@@ -25,6 +31,16 @@ const menuItems = [
     title: "Blog",
     href: "/admin/blog",
     icon: FileText,
+    subItems: [
+      {
+        title: "Tất cả bài viết",
+        href: "/admin/blog",
+      },
+      {
+        title: "Tags",
+        href: "/admin/blog/tags",
+      },
+    ],
   },
   {
     title: "Cài đặt",
@@ -35,6 +51,11 @@ const menuItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Blog"])
+
+  const toggleExpand = (title: string) => {
+    setExpandedItems((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]))
+  }
 
   return (
     <aside className="w-64 bg-card border-r border-border flex flex-col">
@@ -47,21 +68,65 @@ export function AdminSidebar() {
         {menuItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))
-          
+          const hasSubItems = item.subItems && item.subItems.length > 0
+          const isExpanded = expandedItems.includes(item.title)
+
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            <div key={item.href}>
+              {hasSubItems ? (
+                <>
+                  <button
+                    onClick={() => toggleExpand(item.title)}
+                    className={cn(
+                      "flex items-center justify-between w-full gap-3 px-4 py-3 rounded-lg transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium">{item.title}</span>
+                    </div>
+                    <ChevronDown className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")} />
+                  </button>
+                  {isExpanded && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {item.subItems.map((subItem) => {
+                        const isSubActive = pathname === subItem.href
+                        return (
+                          <Link
+                            key={subItem.href}
+                            href={subItem.href}
+                            className={cn(
+                              "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm",
+                              isSubActive
+                                ? "bg-primary/10 text-primary font-medium"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                            )}
+                          >
+                            {subItem.title}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{item.title}</span>
+                </Link>
               )}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="font-medium">{item.title}</span>
-            </Link>
+            </div>
           )
         })}
       </nav>

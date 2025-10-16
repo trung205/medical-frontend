@@ -32,12 +32,17 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Upload, X } from "lucide-react";
+import { ChevronLeft, Plus, Trash2, Upload, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { useCategories } from "@/hooks/admin/useCategories";
-import { useCreateMultipleProductImages, useCreateProduct } from "@/hooks/admin/useProducts";
+import {
+  useCreateMultipleProductImages,
+  useCreateProduct,
+} from "@/hooks/admin/useProducts";
+import { ProductTypeSelector } from "@/components/admin/product-type-selector";
+import { Textarea } from "@/components/ui/textarea";
 
 const productSchema = z.object({
   name: z
@@ -54,31 +59,37 @@ const productSchema = z.object({
   sku: z.string().min(1, "Mã SKU là bắt buộc"),
   summary: z.string(),
   description: z.string(),
-  specifications: z.string(),
   origin: z.string(),
   categoryLevel1Id: z.string().min(1, "Danh mục cấp 1 là bắt buộc"),
-  categoryLevel2Id: z.string().min(1, "Danh mục cấp 2 là bắt buộc"),
-  categoryLevel3Id: z.string().min(1, "Danh mục cấp 3 là bắt buộc"),
+  categoryLevel2Id: z.string().optional(),
+  categoryLevel3Id: z.string().optional(),
   status: z.enum(["active", "inactive"]),
   isFeatured: z.boolean(),
   images: z
     .array(z.instanceof(File))
     .min(1, "Cần ít nhất 1 hình ảnh")
     .max(5, "Tối đa 5 hình ảnh"),
+  productTypeId: z
+    .number({
+      required_error: "Vui lòng chọn loại sản phẩm",
+      invalid_type_error: "Loại sản phẩm không hợp lệ",
+    })
+    .min(1, { message: "Chọn loại sản phẩm" }),
+  specifications: z
+    .array(z.object({ key: z.string(), value: z.string() }))
+    .optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-
 export default function CreateProductPage() {
   const router = useRouter();
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [specifications, setSpecifications] = useState<
+    Array<{ key: string; value: string }>
+  >([{ key: "", value: "" }]);
   const { mutate: mutateCreate, isPending: isCreating } = useCreateProduct();
   const { mutate: createProductImages } = useCreateMultipleProductImages();
-  const { data: level1Categories, isLoading: isLoadingLevel1 }: any =
-    useCategories({
-      level: 1,
-    });
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -88,7 +99,6 @@ export default function CreateProductPage() {
       sku: "",
       summary: "",
       description: "",
-      specifications: "",
       origin: "",
       categoryLevel1Id: "",
       categoryLevel2Id: "",
@@ -96,17 +106,30 @@ export default function CreateProductPage() {
       status: "active",
       isFeatured: false,
       images: [],
+      productTypeId: undefined,
+      specifications: [{ key: "", value: "" }],
     },
   });
+
+  const { data: level1Categories, isLoading: isLoadingLevel1 }: any =
+    useCategories(
+      {
+        level: 1,
+        productTypeId: form.getValues("productTypeId"),
+      },
+      {
+        enabled: !!form.getValues("productTypeId"),
+      }
+    );
 
   const { data: level2Categories, isLoading: isLoadingLevel2 }: any =
     useCategories(
       {
         level: 2,
-        parentId: form.getValues("categoryLevel1Id"), // Giả sử API nhận `parentId`
+        parentId: form.getValues("categoryLevel1Id"),
       },
       {
-        enabled: !!form.getValues("categoryLevel1Id"), // CHỈ chạy query nếu selectedLevel1 có giá trị
+        enabled: !!form.getValues("categoryLevel1Id"),
       }
     );
 
@@ -114,10 +137,10 @@ export default function CreateProductPage() {
     useCategories(
       {
         level: 3,
-        parentId: form.getValues("categoryLevel2Id"), // Giả sử API nhận `parentId`
+        parentId: form.getValues("categoryLevel2Id"),
       },
       {
-        enabled: !!form.getValues("categoryLevel2Id"), // CHỈ chạy query nếu selectedLevel2 có giá trị
+        enabled: !!form.getValues("categoryLevel2Id"),
       }
     );
 
@@ -149,32 +172,42 @@ export default function CreateProductPage() {
     );
   }, [level3Categories]);
 
-
   const onSubmit = (data: ProductFormData) => {
-    const {images, ...rest} = data
+    const { images, categoryLevel2Id, categoryLevel3Id, ...rest } = data;
     const payload = {
       ...rest,
       categoryLevel1Id: Number(rest.categoryLevel1Id),
-      categoryLevel2Id: Number(rest.categoryLevel2Id),
-      categoryLevel3Id: Number(rest.categoryLevel3Id),
+      ...(categoryLevel2Id && {
+        categoryLevel2Id: Number(categoryLevel2Id),
+      }),
+      ...(categoryLevel3Id && {
+        categoryLevel3Id: Number(categoryLevel3Id),
+      }),
     };
-    mutateCreate({
-      payload,
-    }, {
-      onSuccess: (data) => {
-        console.log("data:", data);
-        console.log("images:", images);
-        createProductImages({
-          productId: data?.data.id,
-          images,
-        }, {
-          onSuccess: (data) => {
-            console.log("data:", data);
-            router.push("/admin/products");
-          },
-        })
+
+    mutateCreate(
+      {
+        payload,
       },
-    });
+      {
+        onSuccess: (data) => {
+          console.log("data:", data);
+          console.log("images:", images);
+          createProductImages(
+            {
+              productId: data?.data.id,
+              images,
+            },
+            {
+              onSuccess: (data) => {
+                console.log("data:", data);
+                router.push("/admin/products");
+              },
+            }
+          );
+        },
+      }
+    );
   };
 
   const handleNameChange = (value: string) => {
@@ -226,6 +259,29 @@ export default function CreateProductPage() {
   const handleCategory2Change = (value: string) => {
     form.setValue("categoryLevel2Id", value);
     form.setValue("categoryLevel3Id", "");
+  };
+
+  const addSpecification = () => {
+    const newSpecs = [...specifications, { key: "", value: "" }];
+    setSpecifications(newSpecs);
+    form.setValue("specifications", newSpecs);
+  };
+
+  const removeSpecification = (index: number) => {
+    const newSpecs = specifications.filter((_, i) => i !== index);
+    setSpecifications(newSpecs);
+    form.setValue("specifications", newSpecs);
+  };
+
+  const updateSpecification = (
+    index: number,
+    field: "key" | "value",
+    value: string
+  ) => {
+    const newSpecs = [...specifications];
+    newSpecs[index][field] = value;
+    setSpecifications(newSpecs);
+    form.setValue("specifications", newSpecs);
   };
 
   return (
@@ -305,9 +361,23 @@ export default function CreateProductPage() {
                         <Input
                           placeholder="Nhập xuất xứ"
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(e.target.value)
-                          }
+                          onChange={(e) => field.onChange(e.target.value)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="productTypeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Loại sản phẩm</FormLabel>
+                      <FormControl>
+                        <ProductTypeSelector
+                          value={field.value}
+                          onChange={field.onChange}
                         />
                       </FormControl>
                       <FormMessage />
@@ -324,6 +394,7 @@ export default function CreateProductPage() {
                       <Select
                         onValueChange={handleCategory1Change}
                         value={field.value}
+                        disabled={!form.watch("productTypeId")}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -429,6 +500,27 @@ export default function CreateProductPage() {
                           )}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="summary"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Mô tả ngắn</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Nhập mô tả ngắn về sản phẩm (tối đa 500 ký tự)"
+                          className="min-h-[100px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Mô tả ngắn gọn về sản phẩm, hiển thị trên trang chi tiết
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -560,22 +652,58 @@ export default function CreateProductPage() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="specifications"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
+                <div className="col-span-2 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
                       <FormLabel>Thông số kỹ thuật</FormLabel>
-                      <FormControl>
-                        <RichTextEditor
-                          value={field.value}
-                          onChange={field.onChange}
+                      <FormDescription>
+                        Thêm các thông số kỹ thuật của sản phẩm
+                      </FormDescription>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addSpecification}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Thêm thông số
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {specifications.map((spec, index) => (
+                      <div key={index} className="flex gap-3 items-start">
+                        <Input
+                          placeholder="Tên thông số (VD: Công suất)"
+                          value={spec.key}
+                          onChange={(e) =>
+                            updateSpecification(index, "key", e.target.value)
+                          }
+                          className="flex-1"
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <Input
+                          placeholder="Giá trị (VD: 1000W)"
+                          value={spec.value}
+                          onChange={(e) =>
+                            updateSpecification(index, "value", e.target.value)
+                          }
+                          className="flex-1"
+                        />
+                        {specifications.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeSpecification(index)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">

@@ -1,7 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Star, ShoppingCart } from "lucide-react"
+"use client";
+import { Button } from "@/components/ui/button";
+import { useBlogs } from "@/hooks/user/useBlogs";
+import { BlogGrid } from "./blog-grid";
+import { useRouter } from "next/navigation";
 
 const products = [
   {
@@ -48,38 +49,53 @@ const products = [
     badge: "Chuyên nghiệp",
     features: ["Di động", "Chất lượng cao", "Dễ sử dụng"],
   },
-]
+];
 
 export function FeaturedProducts() {
+  const router = useRouter();
+  const { data: blogs }: any = useBlogs({
+    limit: 3,
+    isFeatured: true,
+  });
+
+  console.log("blogs: ", blogs);
+
+  const handleShowBlogDetail = (blog: any) => {
+    router.push(`/blog/${blog?.slug || ""}`);
+  };
+
   return (
     <section className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-balance">Sản phẩm nổi bật</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-balance">
+            Sản phẩm nổi bật
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-            Những thiết bị y tế được tin dùng nhất bởi các bệnh viện và cơ sở y tế hàng đầu Việt Nam.
+            Những thiết bị y tế được tin dùng nhất bởi các bệnh viện và cơ sở y
+            tế hàng đầu Việt Nam.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {/* {products?.map((product) => (
             <Card
-              key={product.id}
-              className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-primary/20"
+              key={product?.id}
+              className="group hover:shadow-xl transition-all duration-300 border-border/50 hover:border-primary/20 pt-0"
             >
               <CardContent className="p-0">
                 <div className="relative overflow-hidden rounded-t-lg">
                   <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
+                    src={product?.image || "/placeholder.svg"}
+                    alt={product?.name || ""}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">{product.badge}</Badge>
+                  <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">{product?.badge || ""}</Badge>
                 </div>
 
                 <div className="p-4 space-y-3">
                   <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                    {product.name}
+                    {product?.name || ""}
                   </h3>
 
                   <div className="flex items-center gap-1">
@@ -119,15 +135,18 @@ export function FeaturedProducts() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          ))} */}
         </div>
-
+        <BlogGrid
+          blogs={blogs?.data || []}
+          handleShowBlogDetail={handleShowBlogDetail}
+        />
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
-            Xem tất cả sản phẩm
+          <Button variant="outline" size="lg" onClick={() => router.push("/blog")}>
+            Xem tất cả bài viết
           </Button>
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Pencil, Trash2, ArrowUpDown, Eye, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { getImageBlog } from "@/utils/images"
 
 type Blog = {
   id: string
@@ -28,7 +29,8 @@ type Blog = {
   featured: boolean
   image: string
   publishedAt: string | null
-  views: number
+  views: number,
+  thumbnail: any
 }
 
 interface BlogTableProps {
@@ -42,12 +44,12 @@ export function BlogTable({ data, onDelete }: BlogTableProps) {
 
   const columns: ColumnDef<Blog>[] = [
     {
-      accessorKey: "image",
+      accessorKey: "thumbnail",
       header: "Hình ảnh",
-      cell: ({ row }) => (
+      cell: ({ row }: any) => (
         <div className="w-20 h-14 relative rounded-lg overflow-hidden bg-muted">
           <Image
-            src={row.getValue("image") || "/placeholder.svg"}
+            src={getImageBlog(row.getValue("thumbnail")?.id)  || "/placeholder.svg"}
             alt={row.original.title}
             fill
             className="object-cover"
@@ -67,7 +69,7 @@ export function BlogTable({ data, onDelete }: BlogTableProps) {
       },
       cell: ({ row }) => (
         <div className="max-w-md">
-          <div className="font-medium flex items-center gap-2">
+          <div className="font-medium flex items-center gap-2 truncate">
             {row.getValue("title")}
             {row.original.featured && <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />}
           </div>

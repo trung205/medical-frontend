@@ -84,7 +84,6 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
         defaultHeight: 200,
       
         async onUpload(file: File) {
-          /* Chuyển đổi ảnh sang Base64 */
            const uploadedUrl = await uploadFileToStorage(file);
 
           if (uploadedUrl) {

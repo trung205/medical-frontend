@@ -26,4 +26,27 @@ export const deleteBlog = async (id: number) => {
   return res.data;
 };
 
+export const createBlogImage = async (blogId: number, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await adminApi.post(`/blogs/${blogId}/thumbnail`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+};
+
+export const updateBlogImage = async (id: number, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await adminApi.put(`/blogs/thumbnail/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
+};
 

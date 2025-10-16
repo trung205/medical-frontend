@@ -5,6 +5,7 @@ import {
   createProduct,
   createProductImage,
   deleteProduct,
+  deleteProductImage,
   getProduct,
   getProducts,
   updateProduct,
@@ -134,6 +135,34 @@ export const useCreateMultipleProductImages = () => {
         variant: "destructive",
         title: "Lỗi",
         description: "Tạo ít nhất một hình ảnh sản phẩm thất bại!",
+      });
+    },
+  });
+};
+
+export const useRemoveMultipleProductImages = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ images }: { images: any[] }) => {
+      const promises = images.map((image) =>
+        deleteProductImage(image.id)
+      );
+
+      return Promise.all(promises);
+    },
+
+    onSuccess: (results) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    
+
+    onError: (error: any) => {
+      console.log("removeMultipleProductImages error:", error);
+      toast({
+        variant: "destructive",
+        title: "Lỗi",
+        description: "Xóa ít nhất một hình ảnh sản phẩm thất bại!",
       });
     },
   });

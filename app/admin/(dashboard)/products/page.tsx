@@ -28,10 +28,10 @@ export default function ProductsPage() {
   const { data: products = [], pagination = {} } = data || {};
   const { totalPages, total } = pagination || {};
 
-  const handleSearch = (search: string) => {
+  const handleSearch = (name: string, value: string) => {
     setConditions({
       ...conditions,
-      search,
+      [name]: value,
     });
   };
 
