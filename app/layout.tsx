@@ -9,7 +9,7 @@ import 'tiptap-extension-resizable-image/styles.css';
 
 
 export const metadata: Metadata = {
-  title: "MedEquip Pro - Thiết Bị Y Tế Chuyên Nghiệp",
+  title: "NDBio - Thiết Bị Y Tế Chuyên Nghiệp",
   description: "Cung cấp thiết bị y tế chất lượng cao cho các cơ sở y tế và bệnh viện",
   generator: "v0.app",
 }

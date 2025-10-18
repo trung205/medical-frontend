@@ -38,7 +38,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Tổng quan</h1>
         <p className="text-muted-foreground mt-1">
-          Chào mừng bạn đến với trang quản trị MedEquip Pro
+          Chào mừng bạn đến với trang quản trị NDBio
         </p>
       </div>
 

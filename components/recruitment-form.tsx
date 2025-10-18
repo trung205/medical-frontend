@@ -22,6 +22,8 @@ const jobPositions = [
   "Vị trí khác",
 ]
 
+const URL_SHEET_RECRUIT = process.env.NEXT_PUBLIC_FORM_SHEET_RECRUIT
+
 export function RecruitmentForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -40,9 +42,8 @@ export function RecruitmentForm() {
     setIsSubmitting(true)
 
     try {
-      // Submit to Google Sheets via Google Apps Script Web App
       const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbyclmv1Tu3RoeGxsgpmnrEiRdRk4dg7RVpetczzMzflKLBfzmVNlOopnCHz4YPzNA8E/exec", // Replace with your Google Apps Script deployment URL
+        `${URL_SHEET_RECRUIT}`,
         {
           method: "POST",
           mode: "no-cors",
@@ -51,6 +52,7 @@ export function RecruitmentForm() {
           },
           body: JSON.stringify({
             ...formData,
+            phone: `'${formData.phone}`,
             timestamp: new Date().toISOString(),
           }),
         },
@@ -85,8 +87,8 @@ export function RecruitmentForm() {
 
   if (isSubmitted) {
     return (
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4 max-w-2xl">
+      <section  className="py-16 bg-background">
+        <div id="#recruitment-form" className="container mx-auto px-4 max-w-2xl">
           <Card>
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -109,9 +111,9 @@ export function RecruitmentForm() {
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="flex items-center justify-center ">
           {/* Job Description */}
-          <div>
+          {/* <div>
             <h2 className="text-3xl font-bold mb-6">Vị trí tuyển dụng</h2>
 
             <Card className="mb-6">
@@ -157,7 +159,7 @@ export function RecruitmentForm() {
             <p className="text-sm text-muted-foreground">
               * Chúng tôi cũng đang tuyển dụng nhiều vị trí khác. Vui lòng chọn vị trí phù hợp trong form ứng tuyển.
             </p>
-          </div>
+          </div> */}
 
           {/* Application Form */}
           <div>

@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  MedEquip Admin
+                  NDBio Admin
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Hệ thống quản trị
