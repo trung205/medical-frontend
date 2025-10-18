@@ -57,7 +57,7 @@ export default function SearchBox() {
   }, []);
 
   const handleShowProductDetail = (product: any) => {
-    router.push(`/products/detail/${product?.slug || ""}`);
+    router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);
   };
 
   React.useEffect(() => {
