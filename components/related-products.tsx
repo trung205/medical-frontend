@@ -122,7 +122,7 @@ export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
                     </div>
 
                     <Button asChild size="sm" className="w-full">
-                      <Link href={`/products/${product.id}`}>Xem Chi Tiết</Link>
+                      <Link href={`/san-pham/${product.id}`}>Xem Chi Tiết</Link>
                     </Button>
                   </div>
                 </div>

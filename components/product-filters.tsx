@@ -38,7 +38,7 @@ export function ProductFilters({
   console.log(categoriesData)
 
   const onCategorySelect = (categorySlug: string) => {
-    router.push(`/products/${productTypeSlug}/${categorySlug}`);
+    router.push(`/san-pham/${productTypeSlug}/${categorySlug}`);
   }
 
   const brands = ["Philips Healthcare", "GE Healthcare", "Siemens Healthineers", "Mindray", "Nihon Kohden", "Medtronic"]
