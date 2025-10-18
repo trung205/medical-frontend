@@ -1,19 +1,27 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Send, CheckCircle } from "lucide-react"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Send, CheckCircle } from "lucide-react";
 
+const URL_SHEET_CONTACT = process.env.NEXT_PUBLIC_FORM_SHEET_RECRUIT;
 export function ContactForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,33 +31,51 @@ export function ContactForm() {
     subject: "",
     message: "",
     newsletter: false,
-  })
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     // Handle form submission here
-    console.log("Form submitted:", formData)
-    setIsSubmitted(true)
+    console.log("Form submitted:", formData);
+    setIsSubmitted(true);
 
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false)
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        position: "",
-        subject: "",
-        message: "",
-        newsletter: false,
-      })
-    }, 3000)
-  }
+    try {
+      const response = await fetch(`${URL_SHEET_CONTACT}`, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          phone: `'${formData.phone}`,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          position: "",
+          subject: "",
+          message: "",
+          newsletter: false,
+        });
+      }, 3000);
+    } catch (error) {
+      console.error("[v0] Error submitting form:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   if (isSubmitted) {
     return (
@@ -63,18 +89,21 @@ export function ContactForm() {
             Chúng tôi đã nhận được thông tin và sẽ phản hồi trong vòng 24 giờ.
           </p>
           <p className="text-sm text-muted-foreground">
-            Để được hỗ trợ nhanh hơn, vui lòng gọi hotline: <strong>1900-xxxx</strong>
+            Để được hỗ trợ nhanh hơn, vui lòng gọi hotline:{" "}
+            <strong>1900-xxxx</strong>
           </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card className="h-fit">
       <CardHeader>
         <CardTitle className="text-2xl">Gửi yêu cầu tư vấn</CardTitle>
-        <p className="text-muted-foreground">Điền thông tin bên dưới và chúng tôi sẽ liên hệ với bạn sớm nhất</p>
+        <p className="text-muted-foreground">
+          Điền thông tin bên dưới và chúng tôi sẽ liên hệ với bạn sớm nhất
+        </p>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -136,16 +165,22 @@ export function ContactForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="subject">Chủ đề quan tâm</Label>
-              <Select onValueChange={(value) => handleInputChange("subject", value)}>
+              <Select
+                onValueChange={(value) => handleInputChange("subject", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn chủ đề" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="consultation">Tư vấn thiết bị</SelectItem>
                   <SelectItem value="quotation">Báo giá sản phẩm</SelectItem>
-                  <SelectItem value="maintenance">Bảo trì & Sửa chữa</SelectItem>
+                  <SelectItem value="maintenance">
+                    Bảo trì & Sửa chữa
+                  </SelectItem>
                   <SelectItem value="training">Đào tạo sử dụng</SelectItem>
-                  <SelectItem value="partnership">Hợp tác kinh doanh</SelectItem>
+                  <SelectItem value="partnership">
+                    Hợp tác kinh doanh
+                  </SelectItem>
                   <SelectItem value="other">Khác</SelectItem>
                 </SelectContent>
               </Select>
@@ -168,7 +203,9 @@ export function ContactForm() {
             <Checkbox
               id="newsletter"
               checked={formData.newsletter}
-              onCheckedChange={(checked) => handleInputChange("newsletter", checked as boolean)}
+              onCheckedChange={(checked) =>
+                handleInputChange("newsletter", checked as boolean)
+              }
             />
             <Label htmlFor="newsletter" className="text-sm">
               Tôi muốn nhận thông tin về sản phẩm mới và ưu đãi đặc biệt
@@ -190,5 +227,5 @@ export function ContactForm() {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

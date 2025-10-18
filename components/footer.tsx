@@ -1,4 +1,4 @@
-import { Phone, Mail, MapPin, Facebook, Youtube, Linkedin } from "lucide-react"
+import { Phone, Mail, MapPin, Facebook, Youtube, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
@@ -6,14 +6,24 @@ export function Footer() {
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold">MedEquip Pro</h3>
-            <p className="text-primary-foreground/80 text-sm">
+            <h3 className="text-2xl font-bold">NDBio</h3>
+            {/* <p className="text-primary-foreground/80 text-sm">
               Đối tác tin cậy trong việc cung cấp thiết bị y tế chất lượng cao cho các cơ sở y tế trên toàn quốc.
-            </p>
+            </p> */}
             <div className="flex gap-4">
-              <Facebook className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
-              <Youtube className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
-              <Linkedin className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
+              <a
+                href="https://www.facebook.com/ndbiovn/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Facebook className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
+              </a>
+              {/* <a href="https://www.youtube.com/channel/UCY31h33h1h33h1h33h1h33" target="_blank" rel="noopener noreferrer">
+                <Youtube className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
+              </a>
+              <a href="https://www.linkedin.com/company/medequip-pro" target="_blank" rel="noopener noreferrer">
+                <Linkedin className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
+              </a> */}
             </div>
           </div>
 
@@ -21,30 +31,42 @@ export function Footer() {
             <h4 className="font-semibold text-lg">Sản phẩm</h4>
             <ul className="space-y-2 text-sm text-primary-foreground/80">
               <li>
-                <a href="#" className="hover:text-accent transition-colors">
-                  Thiết bị chẩn đoán
+                <a
+                  href="/san-pham/thiet-bi"
+                  className="hover:text-accent transition-colors"
+                >
+                  Thiết bị
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-accent transition-colors">
-                  Thiết bị tim mạch
+                <a
+                  href="/san-pham/hoa-chat"
+                  className="hover:text-accent transition-colors"
+                >
+                  Hóa chất
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-accent transition-colors">
-                  Thiết bị thần kinh
+                <a
+                  href="/san-pham/vat-tu"
+                  className="hover:text-accent transition-colors"
+                >
+                  Vật tư
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-accent transition-colors">
-                  Thiết bị xét nghiệm
+                <a
+                  href="/giai-phap"
+                  className="hover:text-accent transition-colors"
+                >
+                  Giải pháp
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="hover:text-accent transition-colors">
                   Phụ kiện y tế
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -53,7 +75,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-primary-foreground/80">
               <li>
                 <a href="#" className="hover:text-accent transition-colors">
-                  Tư vấn kỹ thuật
+                  Chính sách bảo hành
                 </a>
               </li>
               <li>
@@ -63,45 +85,59 @@ export function Footer() {
               </li>
               <li>
                 <a href="#" className="hover:text-accent transition-colors">
-                  Bảo trì định kỳ
+                  Chính sách kiểm hàng và đổi trả
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-accent transition-colors">
-                  Đào tạo sử dụng
+                  Chính sách bảo mật
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="hover:text-accent transition-colors">
-                  Hỗ trợ 24/7
+                  
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Liên hệ</h4>
             <div className="space-y-3 text-sm text-primary-foreground/80">
-              <div className="flex items-center gap-3">
+              <a href="tel:0828811300" target="_self" className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-accent" />
-                <span>1900-1234</span>
-              </div>
-              <div className="flex items-center gap-3">
+                <span>082 881 1300</span>
+              </a>
+              <a
+                href="mailto:sales@ndbiovn.com"
+                className="flex items-center gap-3"
+                target="_self"
+                rel="noopener noreferrer"
+              >
                 <Mail className="h-4 w-4 text-accent" />
-                <span>info@medequippro.vn</span>
-              </div>
-              <div className="flex items-start gap-3">
+                <span>sales@ndbiovn.com</span>
+              </a>
+              
+              <a
+                href="https://maps.app.goo.gl/BQoftEEvoDY3WTR88"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3"
+              >
                 <MapPin className="h-4 w-4 text-accent mt-0.5" />
-                <span>123 Đường ABC, Quận 1, TP.HCM</span>
-              </div>
+                <span>
+                  Số 4 Ngô Thì Nhậm, phường Quang Trung, Thành phố Hà Nội, Việt
+                  Nam
+                </span>
+              </a>
             </div>
           </div>
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-12 pt-8 text-center text-sm text-primary-foreground/60">
-          <p>&copy; 2025 MedEquip Pro. Tất cả quyền được bảo lưu.</p>
+          <p>&copy; 2025 NDBio. Tất cả quyền được bảo lưu.</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

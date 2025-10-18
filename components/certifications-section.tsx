@@ -3,27 +3,27 @@ import { Badge } from "@/components/ui/badge"
 import { Award, Shield, CheckCircle, Globe } from "lucide-react"
 
 const certifications = [
-  {
-    icon: Award,
-    name: "ISO 13485:2016",
-    description: "Hệ thống quản lý chất lượng thiết bị y tế",
-    issuer: "TÜV SÜD",
-    year: "2024",
-  },
-  {
-    icon: Shield,
-    name: "CE Marking",
-    description: "Chứng nhận tuân thủ tiêu chuẩn Châu Âu",
-    issuer: "EU Notified Body",
-    year: "2024",
-  },
-  {
-    icon: CheckCircle,
-    name: "FDA Registration",
-    description: "Đăng ký với Cục Quản lý Thực phẩm và Dược phẩm Mỹ",
-    issuer: "US FDA",
-    year: "2023",
-  },
+  // {
+  //   icon: Award,
+  //   name: "ISO 13485:2016",
+  //   description: "Hệ thống quản lý chất lượng thiết bị y tế",
+  //   issuer: "TÜV SÜD",
+  //   year: "2024",
+  // },
+  // {
+  //   icon: Shield,
+  //   name: "CE Marking",
+  //   description: "Chứng nhận tuân thủ tiêu chuẩn Châu Âu",
+  //   issuer: "EU Notified Body",
+  //   year: "2024",
+  // },
+  // {
+  //   icon: CheckCircle,
+  //   name: "FDA Registration",
+  //   description: "Đăng ký với Cục Quản lý Thực phẩm và Dược phẩm Mỹ",
+  //   issuer: "US FDA",
+  //   year: "2023",
+  // },
   {
     icon: Globe,
     name: "ISO 9001:2015",
@@ -35,25 +35,16 @@ const certifications = [
 
 const partnerships = [
   {
-    name: "Philips Healthcare",
-    role: "Đại lý chính thức",
-    region: "Việt Nam",
-  },
-  {
-    name: "GE Healthcare",
-    role: "Đối tác phân phối",
-    region: "Đông Nam Á",
-  },
-  {
-    name: "Siemens Healthineers",
-    role: "Đại lý ủy quyền",
-    region: "Việt Nam",
-  },
-  {
-    name: "Mindray",
+    name: "INNOVA",
     role: "Nhà phân phối độc quyền",
-    region: "Miền Nam",
+    region: "Trung Quốc",
   },
+  {
+    name: "ACME",
+    role: "Đối tác phân phối",
+    region: "Trung Quốc",
+  },
+ 
 ]
 
 export function CertificationsSection() {

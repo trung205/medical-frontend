@@ -6,27 +6,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useProductTypes } from "@/hooks/user/useProductTypes";
 import SearchBox from "./ui/search-box";
+import Image from "next/image";
 
 export function Header() {
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const pathname = usePathname();
 
-  const {data: productTypesData}: any = useProductTypes({
-  });
+  const { data: productTypesData }: any = useProductTypes({});
 
   const formattedProductTypes = useMemo(() => {
     return productTypesData?.data?.map((item: any) => ({
       name: item.name,
-      href: `/products/${item.slug}`,
+      href: `/san-pham/${item.slug}`,
     }));
   }, [productTypesData]);
-
 
   const isActive = (path: string) => {
     return pathname === path;
   };
   return (
-    <header className="bg-background border-b border-border sticky top-0 z-50">
+    <header className="border-b border-border bg-[#e5eff3]">
       <div className="bg-primary text-primary-foreground py-3">
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm md:text-base font-medium">
@@ -35,11 +34,17 @@ export function Header() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 bg-[#e5eff3]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="text-2xl font-bold text-primary">
-              NDBio
+              <Image
+                src={"/logo.jpeg"}
+                alt={`Logo}`}
+                width={73}
+                height={32}
+                className="object-cover"
+              />
             </Link>
             <nav className="hidden lg:flex items-center gap-6">
               <Link
@@ -59,14 +64,14 @@ export function Header() {
               >
                 <button
                   className={`text-foreground hover:text-primary transition-colors flex items-center gap-1 relative ${
-                    pathname?.startsWith("/products")
+                    pathname?.startsWith("/san-pham")
                       ? "text-primary font-semibold"
                       : ""
                   }`}
                 >
                   Sản phẩm
                   <ChevronDown className="h-4 w-4" />
-                  {pathname?.startsWith("/products") && (
+                  {pathname?.startsWith("/san-pham") && (
                     <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
                   )}
                 </button>
@@ -90,13 +95,13 @@ export function Header() {
                 )}
               </div>
               <Link
-                href="/solutions"
+                href="/giai-phap"
                 className={`text-foreground hover:text-primary transition-colors relative ${
-                  isActive("/solutions") ? "text-primary font-semibold" : ""
+                  isActive("/giai-phap") ? "text-primary font-semibold" : ""
                 }`}
               >
                 Giải pháp
-                {isActive("/solutions") && (
+                {isActive("/giai-phap") && (
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
                 )}
               </Link>
@@ -116,37 +121,37 @@ export function Header() {
               </Link>
 
               <Link
-                href="/about"
+                href="/gioi-thieu"
                 className={`text-foreground hover:text-primary transition-colors relative ${
-                  isActive("/about") ? "text-primary font-semibold" : ""
+                  isActive("/gioi-thieu") ? "text-primary font-semibold" : ""
                 }`}
               >
                 Về chúng tôi
-                {isActive("/about") && (
+                {isActive("/gioi-thieu") && (
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
                 )}
               </Link>
 
               <Link
-                href="/recruitment"
+                href="/tuyen-dung"
                 className={`text-foreground hover:text-primary transition-colors relative ${
-                  isActive("/recruitment") ? "text-primary font-semibold" : ""
+                  isActive("/tuyen-dung") ? "text-primary font-semibold" : ""
                 }`}
               >
                 Tuyển dụng
-                {isActive("/recruitment") && (
+                {isActive("/tuyen-dung") && ( 
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
                 )}
               </Link>
 
               <Link
-                href="/contact"
+                href="/lien-he"
                 className={`text-foreground hover:text-primary transition-colors relative ${
-                  isActive("/contact") ? "text-primary font-semibold" : ""
+                  isActive("/lien-he") ? "text-primary font-semibold" : ""  
                 }`}
               >
                 Liên hệ
-                {isActive("/contact") && (
+                {isActive("/lien-he") && (
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
                 )}
               </Link>

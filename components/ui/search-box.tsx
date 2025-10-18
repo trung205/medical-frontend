@@ -73,13 +73,13 @@ export default function SearchBox() {
   }, [query]);
 
   return (
-    <div className="relative hidden md:flex items-center bg-secondary rounded-lg px-3 py-2 min-w-[300px]">
+    <div className="relative hidden md:flex items-center bg-secondary rounded-lg px-3 py-2 min-w-[300px] bg-white">
       <Search className="h-4 w-4 text-muted-foreground mr-2" />
       <input
         ref={inputRef}
         type="text"
         placeholder="Tìm kiếm thiết bị y tế..."
-        className="bg-transparent border-none outline-none flex-1 text-sm"
+        className="bg-white border-none outline-none flex-1 text-sm"
         value={query}
         onFocus={() => setIsOpen(true)}
         onChange={(e) => setQuery(e.target.value)}

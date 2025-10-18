@@ -35,7 +35,9 @@ export default function CreateBlogPage() {
                 router.push("/admin/blog");
               },
             })
-          } 
+          } else {
+            router.push("/admin/blog");
+          }
 
         },
       }

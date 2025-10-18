@@ -2,12 +2,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { TrendingUp, Shield, Clock, Star } from "lucide-react"
 
 const stats = [
-  {
-    icon: TrendingUp,
-    value: "98%",
-    label: "Tỷ lệ hài lòng khách hàng",
-    description: "Dựa trên khảo sát 2024",
-  },
+  // {
+  //   icon: TrendingUp,
+  //   value: "98%",
+  //   label: "Tỷ lệ hài lòng khách hàng",
+  //   description: "Dựa trên khảo sát 2024",
+  // },
   {
     icon: Shield,
     value: "24/7",
@@ -39,7 +39,7 @@ export function CompanyStats() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stats.map((stat, index) => (
             <Card key={index} className="text-center hover:shadow-lg transition-shadow">
               <CardContent className="pt-8 pb-6">
