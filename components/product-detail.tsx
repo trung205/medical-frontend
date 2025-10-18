@@ -117,7 +117,7 @@ export function ProductDetail({ product }: any) {
           <div className="space-y-4">
             <Button variant="secondary" size="lg" className="w-full">
               <Phone className="h-5 w-5 mr-2" />
-              Liên hệ tư vấn: 1900-xxxx
+              Liên hệ tư vấn: 082 881 1300
             </Button>
           </div>
           {product?.summary && (
