@@ -36,7 +36,6 @@ import {
 } from "@/hooks/admin/useCategories";
 import { useEffect, useState } from "react";
 
-
 export default function CategoryDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -47,7 +46,7 @@ export default function CategoryDetailPage() {
     search: "",
     parentId: categoryId,
   });
-  const { data, isLoading, isError }:any = useCategories({
+  const { data, isLoading, isError }: any = useCategories({
     page,
     search: condition.search,
     parentId: condition.parentId,
@@ -127,9 +126,7 @@ export default function CategoryDetailPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>
-            Danh mục cấp {category?.level + 1}
-          </CardTitle>
+          <CardTitle>Danh mục cấp {category?.level + 1}</CardTitle>
           <CardDescription>{total} danh mục</CardDescription>
         </CardHeader>
         <CardContent>
@@ -145,7 +142,13 @@ export default function CategoryDetailPage() {
             <TableBody>
               {categories?.length > 0 ? (
                 categories?.map((category: any) => (
-                  <TableRow key={category.id}>
+                  <TableRow
+                    key={category.id}
+                    className="cursor-pointer"
+                    onClick={() =>
+                      router.push(`/admin/categories/${category.id}`)
+                    }
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">
