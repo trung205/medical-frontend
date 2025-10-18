@@ -171,7 +171,13 @@ export default function CategoriesPage() {
             <TableBody>
               {categories?.length > 0 ? (
                 categories?.map((category: any) => (
-                  <TableRow key={category.id}>
+                  <TableRow
+                    key={category.id}
+                    className="cursor-pointer"
+                    onClick={() =>
+                      router.push(`/admin/categories/${category.id}`)
+                    }
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">
