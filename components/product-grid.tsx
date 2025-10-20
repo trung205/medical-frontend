@@ -105,7 +105,7 @@ export function ProductGrid({ products, handleShowProductDetail }: any) {
                   alt={product?.name || ""}
                   width={400}
                   height={300}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full !h-48 object-contain group-hover:scale-105 transition-transform duration-300"
                 />
                 {/* {product.originalPrice && (
                   <Badge className="absolute top-2 left-2 bg-red-500">

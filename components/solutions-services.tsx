@@ -6,7 +6,7 @@ const services = [
     title: "Dây chuyền sản xuất",
     description:
       "Chúng tôi phân phối thiết bị và vật tư chất lượng cao cho ngành công nghiệp công nghệ sinh học đảm bảo phù hợp nhất với nhu cầu khách hàng.",
-    image: "/industrial-production-line-bioreactor.avif",
+    image: "/4785f5ed-6f71-4fdd-a3f7-2e1424de8527.jpeg",
   },
   {
     title: "Quy trình sản xuất",
@@ -29,8 +29,8 @@ export function SolutionsServices() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow !pt-0 gap-0">
-              <div className="relative h-48 w-full">
-                <Image src={service.image || "/placeholder.svg"} alt={service.title} fill className="object-cover" />
+              <div className="relative h-[275px] w-full">
+                <Image src={service.image || "/placeholder.svg"} alt={service.title} fill className="object-contain" />
               </div>
               <CardContent className="p-6">
                 <h3 className="text-xl font-bold mb-3">{service.title}</h3>

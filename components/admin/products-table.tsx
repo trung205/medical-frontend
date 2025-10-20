@@ -43,7 +43,7 @@ interface ProductsTableProps {
 
 const LINK_API_URL = process.env.NEXT_PUBLIC_API_URL
 
-export function ProductsTable({ data, handleSearch, conditions }: any) {
+export function ProductsTable({ data, handleSearch, conditions, handleSubmitDelete }: any) {
   const router = useRouter()
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState("")
@@ -58,6 +58,7 @@ export function ProductsTable({ data, handleSearch, conditions }: any) {
   const handleDelete = (id: string) => {
     if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này?")) {
       console.log("[v0] Delete product:", id)
+      handleSubmitDelete(id)
     }
   }
 

@@ -10,10 +10,10 @@ export function SolutionsHero() {
           <p className="text-lg text-muted-foreground mb-8 text-pretty">
             Chúng tôi cung cấp giải pháp toàn diện cho quy trình sản xuất công nghệ sinh học
           </p>
-          <Button size="lg">
+          {/* <Button size="lg">
             Khám phá
             <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </section>

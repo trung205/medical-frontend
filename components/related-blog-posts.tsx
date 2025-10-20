@@ -9,40 +9,6 @@ import { useMemo } from "react"
 import { getImageBlog } from "@/utils/images"
 import { Tag } from "./ui/tag"
 
-const relatedPosts = [
-  {
-    id: 2,
-    title: "Công nghệ AI trong chẩn đoán hình ảnh y khoa",
-    excerpt:
-      "Khám phá cách trí tuệ nhân tạo đang cách mạng hóa lĩnh vực chẩn đoán hình ảnh và nâng cao độ chính xác trong y học.",
-    category: "Công nghệ",
-    author: "TS. Trần Thị B",
-    date: "12/01/2024",
-    image: "/blog-ai-medical-imaging.jpg",
-    readTime: "7 phút đọc",
-  },
-  {
-    id: 3,
-    title: "Bảo trì thiết bị y tế: Quy trình chuẩn và lưu ý quan trọng",
-    excerpt: "Hướng dẫn chi tiết về quy trình bảo trì thiết bị y tế để đảm bảo hoạt động ổn định và tuổi thọ lâu dài.",
-    category: "Bảo trì",
-    author: "KS. Lê Văn C",
-    date: "10/01/2024",
-    image: "/blog-equipment-maintenance.jpg",
-    readTime: "6 phút đọc",
-  },
-  {
-    id: 4,
-    title: "Xu hướng thiết bị y tế thông minh năm 2024",
-    excerpt: "Điểm qua những xu hướng công nghệ mới nhất trong lĩnh vực thiết bị y tế và IoT trong chăm sóc sức khỏe.",
-    category: "Xu hướng",
-    author: "BS. Phạm Thị D",
-    date: "08/01/2024",
-    image: "/blog-smart-medical-devices.jpg",
-    readTime: "8 phút đọc",
-  },
-]
-
 interface RelatedBlogPostsProps {
   currentPostId: number
 }

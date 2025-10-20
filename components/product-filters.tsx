@@ -13,16 +13,6 @@ export function ProductFilters({
   productTypeSlug = '',
 }: any) {
   const router = useRouter();
-  const [priceRange, setPriceRange] = useState([0, 1000000000])
-
-  const categories = [
-    "Thiết bị chẩn đoán hình ảnh",
-    "Thiết bị theo dõi bệnh nhân",
-    "Thiết bị phẫu thuật",
-    "Thiết bị cấp cứu",
-    "Thiết bị phòng thí nghiệm",
-    "Thiết bị vật lý trị liệu",
-  ]
 
   const {data: categoriesData}: any = useCategories({
     productTypeSlug,
@@ -35,13 +25,10 @@ export function ProductFilters({
   const categoryList = useMemo(() => buildCategoryTree(categoriesData?.data || []), [categoriesData]);
   console.log("categoryList: ", categoryList)
 
-  console.log(categoriesData)
 
   const onCategorySelect = (categorySlug: string) => {
     router.push(`/san-pham/${productTypeSlug}/${categorySlug}`);
   }
-
-  const brands = ["Philips Healthcare", "GE Healthcare", "Siemens Healthineers", "Mindray", "Nihon Kohden", "Medtronic"]
 
   return (
     <div className="space-y-6">

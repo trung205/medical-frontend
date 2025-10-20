@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { ProductsTable } from "@/components/admin/products-table";
 import Link from "next/link";
-import { useProducts } from "@/hooks/admin/useProducts";
+import { useDeleteProduct, useProducts } from "@/hooks/admin/useProducts";
 import { CommonPagination } from "@/components/ui/common-pagination";
 
 export default function ProductsPage() {
@@ -25,6 +25,8 @@ export default function ProductsPage() {
     ...conditions,
   });
 
+  const {mutate: mutateDelete} = useDeleteProduct()
+
   const { data: products = [], pagination = {} } = data || {};
   const { totalPages, total } = pagination || {};
 
@@ -34,6 +36,10 @@ export default function ProductsPage() {
       [name]: value,
     });
   };
+
+  const handleSubmitDelete = (id: string) => {
+    mutateDelete(Number(id));
+  }
 
   return (
     <div className="space-y-6">
@@ -58,6 +64,7 @@ export default function ProductsPage() {
         data={products}
         handleSearch={handleSearch}
         conditions={conditions}
+        handleSubmitDelete={handleSubmitDelete}
       />
       <CommonPagination
         currentPage={page}

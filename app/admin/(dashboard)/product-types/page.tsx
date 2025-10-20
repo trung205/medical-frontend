@@ -6,9 +6,6 @@ import { Plus, ChevronRight, Pencil, Trash2, FolderOpen } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -18,13 +15,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { CategoryDialog } from "@/components/admin/category-dialog";
-import { useCategories, useCreateCategory, useUpdateCategory } from "@/hooks/admin/useCategories";
 import { CommonPagination } from "@/components/ui/common-pagination";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 import { ProductTypeDialog } from "@/components/admin/product-type-dialog";
-import { useProductTypes, useUpdateProductType } from "@/hooks/admin/useProductTypes";
+import {
+  useDeleteProductType,
+  useProductTypes,
+  useUpdateProductType,
+} from "@/hooks/admin/useProductTypes";
 import { useCreateProductType } from "@/hooks/admin/useProductTypes";
 
 export default function ProductTypesPage() {
@@ -37,10 +35,16 @@ export default function ProductTypesPage() {
     page,
     search: condition.search,
   });
-  const { mutate: mutateUpdate, isPending: isUpdating } = useUpdateProductType();
-  const { mutate: mutateCreate, isPending: isCreating } = useCreateProductType();
+  const { mutate: mutateUpdate, isPending: isUpdating } =
+    useUpdateProductType();
+  const { mutate: mutateCreate, isPending: isCreating } =
+    useCreateProductType();
+  const { mutate: mutateDelete, isPending: isDeleting } =
+    useDeleteProductType();
 
-  const [editingProductType, setEditingProductType] = useState<any | null>(null);
+  const [editingProductType, setEditingProductType] = useState<any | null>(
+    null
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: productTypes = [], pagination = {} } = data || {};
@@ -62,6 +66,7 @@ export default function ProductTypesPage() {
   const handleDelete = (id: string) => {
     if (confirm("Bạn có chắc chắn muốn xóa loại sản phẩm này?")) {
       console.log("[v0] Delete product type:", id);
+      mutateDelete(Number(id));
     }
   };
 
@@ -91,7 +96,6 @@ export default function ProductTypesPage() {
       </div>
 
       <Card>
-        
         <CardContent>
           <Table>
             <TableHeader>
@@ -104,7 +108,7 @@ export default function ProductTypesPage() {
             <TableBody>
               {productTypes?.length > 0 ? (
                 productTypes?.map((productType: any) => (
-                  <TableRow key={productType.id}> 
+                  <TableRow key={productType.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">

@@ -12,7 +12,7 @@ export default function SolutionsPage() {
       <Header />
       <SolutionsHero />
       <SolutionsServices />
-      <SolutionsIntro />
+      {/* <SolutionsIntro /> */}
       {/* <SolutionsTestimonials /> */}
       <SolutionsProjects />
       <Footer />

@@ -26,7 +26,7 @@ export default function ProductsPage() {
   })
   console.log("products", products)
   const handleShowProductDetail = (product: any) => {
-    router.push(`/san-pham/${product?.slug || ""}`)
+    router.push(`/san-pham/chi-tiet/${product?.slug || ""}`)
   }
 
 
@@ -41,10 +41,10 @@ export default function ProductsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-4">
-            Danh Mục Thiết Bị Y Tế
+            Danh Mục Sản Phẩm
           </h1>
           <p className="text-muted-foreground">
-            Khám phá bộ sưu tập đầy đủ các thiết bị y tế chất lượng cao từ các thương hiệu uy tín
+            Khám phá bộ sưu tập đầy đủ các sản phẩm chất lượng cao từ các thương hiệu uy tín
           </p>
         </div>
 
