@@ -151,3 +151,146 @@ img, video {
   max-width: 100% !important;
   height: auto;
 }
+
+.prose {
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: #111827;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+  margin-bottom: 0.8em;
+}
+
+.prose h2 {
+  font-size: 1.75em;
+}
+
+.prose h3 {
+  font-size: 1.5em;
+}
+
+.prose h4 {
+  font-size: 1.25em;
+}
+
+.prose p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose a {
+  color: #2563eb;
+  text-decoration: underline;
+  font-weight: 500;
+}
+.prose a:hover {
+  color: #1d4ed8;
+}
+
+.prose strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.prose blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  color: #6b7280;
+  font-style: italic;
+  margin: 1.5em 0;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.625em;
+}
+
+.prose li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose code {
+  background-color: #f3f4f6;
+  color: #111827;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.prose pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.875em;
+  line-height: 1.6;
+}
+
+.prose pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+}
+
+.prose img {
+  border-radius: 8px;
+  margin: 1.5em 0;
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2em 0;
+}
+
+.prose figure {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+.prose figcaption {
+  font-size: 0.875em;
+  color: #6b7280;
+  margin-top: 0.5em;
+}
+
+.prose.prose-invert {
+  color: #d1d5db;
+}
+.prose.prose-invert h1,
+.prose.prose-invert h2,
+.prose.prose-invert h3,
+.prose.prose-invert h4 {
+  color: #f9fafb;
+}
+.prose.prose-invert a {
+  color: #93c5fd;
+}
+.prose.prose-invert blockquote {
+  border-left-color: #374151;
+  color: #9ca3af;
+}
+.prose.prose-invert code {
+  background-color: #374151;
+  color: #f9fafb;
+}
+.prose.prose-invert pre {
+  background-color: #111827;
+}

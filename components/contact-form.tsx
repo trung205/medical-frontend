@@ -18,7 +18,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Send, CheckCircle } from "lucide-react";
 
-const URL_SHEET_CONTACT = process.env.NEXT_PUBLIC_FORM_SHEET_RECRUIT;
+const URL_SHEET_CONTACT = process.env.NEXT_PUBLIC_FORM_SHEET_CONTACT;
 export function ContactForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)

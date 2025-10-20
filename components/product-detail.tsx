@@ -68,7 +68,7 @@ export function ProductDetail({ product }: any) {
               alt={product?.name || ""}
               width={600}
               height={400}
-              className="w-full h-96 object-contain"
+              className="w-full !h-96 object-contain"
             />
             {/* {product.originalPrice && (
               <Badge className="absolute top-4 left-4 bg-red-500">Giảm {discountPercentage}%</Badge>

@@ -21,10 +21,7 @@ export default function SearchBox() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [suggestions] = React.useState([
-    "Máy siêu âm",
-    "Máy đo huyết áp",
-    "Ống nghe y tế",
-    "Giường bệnh nhân",
+    ""
   ]);
   const debouncedSearch = useDebounce(query, 500);
 
@@ -78,7 +75,7 @@ export default function SearchBox() {
       <input
         ref={inputRef}
         type="text"
-        placeholder="Tìm kiếm thiết bị y tế..."
+        placeholder="Tìm kiếm ..."
         className="bg-white border-none outline-none flex-1 text-sm"
         value={query}
         onFocus={() => setIsOpen(true)}

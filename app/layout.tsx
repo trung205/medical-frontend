@@ -9,9 +9,9 @@ import 'tiptap-extension-resizable-image/styles.css';
 
 
 export const metadata: Metadata = {
-  title: "NDBio - Thiết Bị Y Tế Chuyên Nghiệp",
-  description: "Cung cấp thiết bị y tế chất lượng cao cho các cơ sở y tế và bệnh viện",
-  generator: "v0.app",
+  title: "NDBio - Giải pháp Công nghệ sinh học toàn diện",
+  description: "Công ty phân phối thiết bị và giải pháp toàn diện cho công nghệ sinh học tại Việt Nam | NDbio",
+  generator: "ndbiovn.com",
 }
 
 export default function RootLayout({

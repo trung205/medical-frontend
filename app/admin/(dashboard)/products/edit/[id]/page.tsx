@@ -827,7 +827,7 @@ export default function EditProductPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {specifications.length > 0 && specifications?.map((spec, index) => (
+                    {specifications?.length > 0 && specifications?.map((spec, index) => (
                       <div key={index} className="flex gap-3 items-start">
                         <Input
                           placeholder="Tên thông số (VD: Công suất)"

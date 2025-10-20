@@ -8,8 +8,8 @@ const teamMembers = [
     name: "Ông Trần Sơn Tùng",
     position: "Người sáng lập",
     experience: "20+ năm kinh nghiệm",
-    specialization: `Giám đốc điều hành, Giám đốc điều hành`,
-    image: "/placeholder.svg?key=ceo",
+    specialization: `Giám đốc điều hành`,
+    image: "a16f721b-b57a-40cc-8381-83bf549d585e.jpeg",
     education: "MBA - Đại học Kinh tế TP.HCM",
   },
   {
@@ -18,7 +18,7 @@ const teamMembers = [
     experience: "15+ năm kinh nghiệm",
     specialization:
       "Trưởng phòng Quản lý sản phẩm, Trưởng phòng kỹ thuật và dịch vụ khách hàng",
-    image: "/IMG_66821D356EF6-1.jpeg",
+    image: "/b357019e-4cc9-4a96-85c3-eea8378ed255.jpeg",
     education: "Tiến sĩ Kỹ thuật Y sinh - ĐH Bách Khoa",
   },
   {
@@ -26,8 +26,8 @@ const teamMembers = [
     position: "Đồng sáng lập",
     experience: "12+ năm kinh nghiệm",
     specialization: "Quản Lý vận hành, Trưởng phòng marketing",
-    image: "/placeholder.svg?key=sales",
     education: "Thạc sĩ Quản trị Kinh doanh",
+    image: "/83ca66bd-360c-4626-a0a2-b553891942ce.jpeg",
   },
   // {
   //   name: "Phạm Thị Lan",
@@ -68,55 +68,13 @@ export function TeamSection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Đội ngũ lãnh đạo</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          {/* <p className="text-muted-foreground max-w-2xl mx-auto">
             Những chuyên gia hàng đầu với nhiều năm kinh nghiệm trong lĩnh vực
             thiết bị y tế
-          </p>
+          </p> */}
         </div>
 
         {/* Leadership Team */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {teamMembers.map((member, index) => (
-            <Card
-              key={index}
-              className="text-center hover:shadow-lg transition-shadow p-0 rounded-none"
-            >
-              <CardContent className="p-0">
-                <div className="relative w-full aspect-square mb-4 p-0">
-                  <Image
-                    src={member.image || "/placeholder.svg"}
-                    alt={member.name}
-                    fill
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col items-center px-4 pb-8">
-                  <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
-                  <p className="text-primary font-medium mb-2">
-                    {member.position}
-                  </p>
-                  {/* <Badge variant="outline" className="mb-3">
-                  {member.experience}
-                </Badge> */}
-
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {member.specialization}
-                  </p>
-                  {/* <p className="text-xs text-muted-foreground mb-4">{member.education}</p>
-
-                <div className="flex justify-center gap-2">
-                  <button className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
-                    <Linkedin className="h-4 w-4" />
-                  </button>
-                  <button className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
-                    <Mail className="h-4 w-4" />
-                  </button>
-                </div> */}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
           {teamMembers.map((member, index) => (
             <Card
@@ -138,25 +96,25 @@ export function TeamSection() {
                 <p className="text-primary font-medium mb-2">
                   {member.position}
                 </p>
-                <Badge variant="outline" className="mb-3">
+                {/* <Badge variant="outline" className="mb-3">
                   {member.experience}
-                </Badge>
+                </Badge> */}
 
                 <p className="text-sm text-muted-foreground mb-3">
                   {member.specialization}
                 </p>
-                <p className="text-xs text-muted-foreground mb-4">
+                {/* <p className="text-xs text-muted-foreground mb-4">
                   {member.education}
-                </p>
+                </p> */}
 
-                <div className="flex justify-center gap-2">
+                {/* <div className="flex justify-center gap-2">
                   <button className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
                     <Linkedin className="h-4 w-4" />
                   </button>
                   <button className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
                     <Mail className="h-4 w-4" />
                   </button>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           ))}

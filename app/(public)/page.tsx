@@ -1,29 +1,26 @@
 "use client";
 
 import { Header } from "@/components/header";
-import { HeroSection } from "@/components/hero-section";
 import { FeaturedBlogs } from "@/components/featured-blogs";
 import { Footer } from "@/components/footer";
 import { useBlogs } from "@/hooks/user/useBlogs";
-import router from "next/router";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation"
 
 const services = [
   {
     title: "Thiết bị lên men",
     description:
       "Cung cấp thiết bị lên men chất lượng cao cho ngành công nghiệp công nghệ sinh học tại Việt Nam.",
-    image: "/industrial-production-line-bioreactor.avif",
+    image: "/thiet-bi-len-men.jpeg",
   },
   {
     title: "Giải pháp toàn diện",
     description:
       "Mang đến giải pháp toàn diện cho đối tác ứng dụng công nghệ sinh học từ khâu phát triển nghiên cứu đến nhân rộng quy mô sản xuất.",
-    image: "/laboratory-glassware-yellow-liquid.avif",
+    image: "/giai-phap-toan-dien.jpeg",
   },
   {
     title: "Hỗ trợ kỹ thuật",
@@ -38,33 +35,34 @@ const products = [
     title: "Thiết bị",
     description:
       "Cung cấp thiết bị lên men chất lượng cao cho ngành công nghiệp công nghệ sinh học tại Việt Nam.",
-    image: "/industrial-production-line-bioreactor.avif",
+    image: "/d1ea7253-5712-47ca-911f-720d88143c89.jpeg",
     href: "/san-pham/thiet-bi",
   },
   {
     title: "Vật tư",
     description:
       "Mang đến giải pháp toàn diện cho đối tác ứng dụng công nghệ sinh học từ khâu phát triển nghiên cứu đến nhân rộng quy mô sản xuất.",
-    image: "/laboratory-glassware-yellow-liquid.avif",
+    image: "/1348c7c1-7da1-4ffe-bef5-6ca08eb45770.jpeg",
     href: "/san-pham/vat-tu",
   },
   {
     title: "Hóa chất",
     description:
       "Đội ngũ chuyên gia của chúng tôi sẵn sàng hỗ trợ và tư vấn cho khách hàng về cả trang thiết bị, đến nguyên liệu, vật tư, quy trình đảm bảo vận hành hiệu quả.",
-    image: "/engineer-with-hard-hat-and-wrench-3d.avif",
+    image: "/2006fb4e-e755-4fe5-8e11-e81808a76bdd.jpeg",
     href: "/san-pham/hoa-chat",
   },
   {
     title: "Giải pháp",
     description:
       "Đội ngũ chuyên gia của chúng tôi sẵn sàng hỗ trợ và tư vấn cho khách hàng về cả trang thiết bị, đến nguyên liệu, vật tư, quy trình đảm bảo vận hành hiệu quả.",
-    image: "/engineer-with-hard-hat-and-wrench-3d.avif",
+    image: "/6e3e0d14-ec59-4566-b11c-f10d00a3433f.jpeg",
     href: "/giai-phap",
   },
 ];
 
 export default function HomePage() {
+  const router = useRouter();
   const { data: blogs }: any = useBlogs({
     limit: 3,
     isFeatured: true,
@@ -73,7 +71,7 @@ export default function HomePage() {
     <main className="min-h-screen">
       <Header />
       {/* <HeroSection /> */}
-      <div className="relative w-full h-screen overflow-hidden">
+      <div className="relative w-full overflow-hidden min-h-fit">
         {/* Video nền */}
         <video
           className="absolute top-0 left-0 w-full h-[720px] object-cover"
@@ -89,7 +87,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/40" />
 
         {/* Nội dung */}
-        <div className="relative z-10 flex flex-col items-center py-32 h-full text-white">
+        <div className="relative z-10 flex flex-col items-center py-32 text-white">
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 text-center">
             Giải pháp công nghệ sinh học toàn diện
           </h1>
@@ -98,7 +96,7 @@ export default function HomePage() {
             diện tại Việt Nam.
           </p>
           <button
-            className="my-12 border border-white py-4 px-8 text-white font-bold rounded-full"
+            className="my-12 border border-white py-4 px-8 text-white font-bold rounded-full cursor-pointer"
             onClick={() => router.push("/blog")}
           >
             Xem thêm

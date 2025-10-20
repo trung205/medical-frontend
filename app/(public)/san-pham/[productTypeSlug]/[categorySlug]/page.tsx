@@ -1,32 +1,30 @@
-"use client"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { ProductGrid } from "@/components/product-grid"
-import { ProductFilters } from "@/components/product-filters"
-import { useProducts, useProductsInfinite } from "@/hooks/user/useProducts"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button" // hoặc tự tạo button
-import { useState } from "react"
+"use client";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { ProductGrid } from "@/components/product-grid";
+import { ProductFilters } from "@/components/product-filters";
+import { useProducts, useProductsInfinite } from "@/hooks/user/useProducts";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button"; // hoặc tự tạo button
+import { useState } from "react";
+import { useProductTypes } from "@/hooks/user/useProductTypes";
 
 export default function CategoriesDetailPage({ params }: any) {
-  const { productTypeSlug, categorySlug } = params
-  // const router = useRouter()
+  const { productTypeSlug, categorySlug } = params;
 
-  // const {
-  //   data: products,
-  //   fetchNextPage,
-  //   hasNextPage,
-  //   isFetchingNextPage,
-  //   isLoading,
-  // } = useProductsInfinite({
-  //   categorySlug: id,
-  //   limit: 12,
-  // })
+  const router = useRouter();
+  const { data: productTypesData }: any = useProductTypes(
+    {
+      search: productTypeSlug,
+    },
+    {
+      enabled: !!productTypeSlug,
+    }
+  );
 
-  // const handleShowProductDetail = (product: any) => {
-  //   router.push(`/products/${product?.slug || ""}`)
-  // }
-   const router = useRouter()
+  const productType = productTypesData?.data?.[0] || {};
+
+  console.log("productTypesData: ", productTypesData);
 
   const {
     data: products,
@@ -37,34 +35,34 @@ export default function CategoriesDetailPage({ params }: any) {
   }: any = useProductsInfinite({
     categorySlug,
     limit: 6,
-  })
-  console.log("products", products)
+  });
+  console.log("products", products);
   const handleShowProductDetail = (product: any) => {
-    router.push(`/san-pham/${product?.slug || ""}`)
-  }
-
+    router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);
+  };
 
   const formattedProducts =
-    products?.pages.flatMap((page: any) => page.data).flatMap((item: any) => item.data) || []
-  console.log("hasNextPage", hasNextPage)
-  console.log("formattedProducts", formattedProducts)
+    products?.pages
+      .flatMap((page: any) => page.data)
+      .flatMap((item: any) => item.data) || [];
+  console.log("hasNextPage", hasNextPage);
+  console.log("formattedProducts", formattedProducts);
 
   return (
     <main className="min-h-screen">
       <Header />
+      <section className="py-12 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+        <h1 className="text-5xl font-bold text-foreground  text-center ">
+          {productType?.name || ""}
+        </h1>
+      </section>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">
-            Danh Mục Thiết Bị Y Tế
-          </h1>
-          <p className="text-muted-foreground">
-            Khám phá bộ sưu tập đầy đủ các thiết bị y tế chất lượng cao từ các thương hiệu uy tín
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-1">
-            <ProductFilters productTypeSlug={productTypeSlug} slug={categorySlug} />
+            <ProductFilters
+              productTypeSlug={productTypeSlug}
+              slug={categorySlug}
+            />
           </div>
           <div className="lg:col-span-3">
             {isLoading ? (
@@ -92,5 +90,5 @@ export default function CategoriesDetailPage({ params }: any) {
       </div>
       <Footer />
     </main>
-  )
+  );
 }
