@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation"
+import { useRef } from "react";
 
 const services = [
   {
@@ -63,10 +64,26 @@ const products = [
 
 export default function HomePage() {
   const router = useRouter();
+  const refIntro = useRef<HTMLDivElement>(null);
   const { data: blogs }: any = useBlogs({
     limit: 3,
     isFeatured: true,
   });
+
+ const handleScroll = () => {
+     if (refIntro.current) {
+      const offset = 0; // 👉 khoảng cách muốn chừa lại (px)
+      const top =
+        refIntro.current.getBoundingClientRect().top +
+        window.scrollY -
+        offset;
+
+      window.scrollTo({
+        top,
+        behavior: "smooth",
+      });
+    }
+  };
   return (
     <main className="min-h-screen">
       <Header />
@@ -97,9 +114,9 @@ export default function HomePage() {
           </p>
           <button
             className="my-12 border border-white py-4 px-8 text-white font-bold rounded-full cursor-pointer"
-            onClick={() => router.push("/blog")}
+            onClick={() => handleScroll()}
           >
-            Xem thêm
+            Khám phá
           </button>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
             <div className="bg-white/10 text-white p-12 rounded text-center">
@@ -118,7 +135,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-background" ref={refIntro}>
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-5xl font-bold mb-6 text-center">

@@ -25,7 +25,7 @@ export default function RecruitmentPage() {
 
   const handleScroll = () => {
      if (sectionFormRef.current) {
-      const offset = 100; // 👉 khoảng cách muốn chừa lại (px)
+      const offset = 0; // 👉 khoảng cách muốn chừa lại (px)
       const top =
         sectionFormRef.current.getBoundingClientRect().top +
         window.scrollY -
