@@ -1,17 +1,29 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { LayoutDashboard, Package, FileText, FolderTree, Settings, LogOut, ChevronDown, Box } from "lucide-react"
-import { useState } from "react"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import {
+  LayoutDashboard,
+  Package,
+  FileText,
+  FolderTree,
+  Settings,
+  LogOut,
+  ChevronDown,
+  Box,
+} from "lucide-react";
+import { useAppDispatch } from "@/store/hooks";
+import { logout } from "@/store/slices/userSlice";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
-  {
-    title: "Tổng quan",
-    href: "/admin",
-    icon: LayoutDashboard,
-  },
+  // {
+  //   title: "Tổng quan",
+  //   href: "/admin",
+  //   icon: LayoutDashboard,
+  // },
   {
     title: "Loại sản phẩm",
     href: "/admin/product-types",
@@ -47,15 +59,26 @@ const menuItems = [
     href: "/admin/settings",
     icon: Settings,
   },
-]
+];
 
 export function AdminSidebar() {
-  const pathname = usePathname()
-  const [expandedItems, setExpandedItems] = useState<string[]>(["Blog"])
+  const router = useRouter();
+  const pathname = usePathname();
+  const dispatch = useAppDispatch();
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Blog"]);
 
   const toggleExpand = (title: string) => {
-    setExpandedItems((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]))
-  }
+    setExpandedItems((prev) =>
+      prev.includes(title)
+        ? prev.filter((item) => item !== title)
+        : [...prev, title]
+    );
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/admin/login");
+  };
 
   return (
     <aside className="w-64 bg-card border-r border-border flex flex-col">
@@ -66,10 +89,12 @@ export function AdminSidebar() {
 
       <nav className="flex-1 p-4 space-y-1">
         {menuItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href))
-          const hasSubItems = item.subItems && item.subItems.length > 0
-          const isExpanded = expandedItems.includes(item.title)
+          const Icon = item.icon;
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
+          const hasSubItems = item.subItems && item.subItems.length > 0;
+          const isExpanded = expandedItems.includes(item.title);
 
           return (
             <div key={item.href}>
@@ -81,19 +106,24 @@ export function AdminSidebar() {
                       "flex items-center justify-between w-full gap-3 px-4 py-3 rounded-lg transition-colors",
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
                     <div className="flex items-center gap-3">
                       <Icon className="w-5 h-5" />
                       <span className="font-medium">{item.title}</span>
                     </div>
-                    <ChevronDown className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")} />
+                    <ChevronDown
+                      className={cn(
+                        "w-4 h-4 transition-transform",
+                        isExpanded && "rotate-180"
+                      )}
+                    />
                   </button>
                   {isExpanded && (
                     <div className="ml-4 mt-1 space-y-1">
                       {item.subItems.map((subItem) => {
-                        const isSubActive = pathname === subItem.href
+                        const isSubActive = pathname === subItem.href;
                         return (
                           <Link
                             key={subItem.href}
@@ -102,12 +132,12 @@ export function AdminSidebar() {
                               "flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm",
                               isSubActive
                                 ? "bg-primary/10 text-primary font-medium"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             )}
                           >
                             {subItem.title}
                           </Link>
-                        )
+                        );
                       })}
                     </div>
                   )}
@@ -119,7 +149,7 @@ export function AdminSidebar() {
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                     isActive
                       ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
                   <Icon className="w-5 h-5" />
@@ -127,16 +157,19 @@ export function AdminSidebar() {
                 </Link>
               )}
             </div>
-          )
+          );
         })}
       </nav>
 
       <div className="p-4 border-t border-border">
-        <button className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors w-full">
+        <button
+          onClick={() => handleLogout()}
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors w-full"
+        >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Đăng xuất</span>
         </button>
       </div>
     </aside>
-  )
+  );
 }

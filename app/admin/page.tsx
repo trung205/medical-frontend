@@ -1,7 +1,12 @@
+"use client";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Package, FileText, FolderTree, TrendingUp } from 'lucide-react'
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+
   const stats = [
     {
       title: "Tổng sản phẩm",
@@ -32,6 +37,10 @@ export default function AdminDashboard() {
       trendUp: true,
     },
   ]
+
+  useEffect(() => {
+      router.push("/admin/product-types");
+  }, [router]);
 
   return (
     <div className="space-y-6">

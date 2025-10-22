@@ -31,6 +31,28 @@ import {
 import { useEffect, useState } from "react";
 import { ProductTypeSelector } from "./product-type-selector";
 
+const categoryLevel1Schema = z.object({
+  name: z
+    .string()
+    .min(1, "Tên danh mục là bắt buộc")
+    .max(100, "Tên danh mục không được quá 100 ký tự"),
+  slug: z
+    .string()
+    .min(1, "Slug là bắt buộc")
+    .regex(
+      /^[a-z0-9-]+$/,
+      "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"
+    ),
+  productTypeId: z
+    .number({
+      required_error: "Vui lòng chọn loại sản phẩm",
+      invalid_type_error: "Loại sản phẩm không hợp lệ",
+    })
+    .min(1, { message: "Chọn loại sản phẩm" }),
+  // description: z.string().max(500, "Mô tả không được quá 500 ký tự"),
+  // parentId: z.string().nullable(),
+});
+
 const categorySchema = z.object({
   name: z
     .string()
@@ -44,15 +66,12 @@ const categorySchema = z.object({
       "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"
     ),
   productTypeId: z
-  .number({
-    required_error: "Vui lòng chọn loại sản phẩm",
-    invalid_type_error: "Loại sản phẩm không hợp lệ",
-  })
-  .min(1, { message: "Chọn loại sản phẩm" }),
-  // description: z.string().max(500, "Mô tả không được quá 500 ký tự"),
-  // parentId: z.string().nullable(),
-});
+    .number({
+      invalid_type_error: "Loại sản phẩm không hợp lệ",
+    })
+    .optional(),
 
+});
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 interface CategoryDialogProps {
@@ -62,6 +81,7 @@ interface CategoryDialogProps {
   onOpenChange: (open: boolean) => void;
   onHandleSubmitEdit: (data: any) => void;
   onHandleSubmitCreate: (data: any) => void;
+  level?: number;
 }
 
 export function CategoryDialog({
@@ -71,10 +91,13 @@ export function CategoryDialog({
   onOpenChange,
   onHandleSubmitEdit,
   onHandleSubmitCreate,
+  level,
 }: CategoryDialogProps) {
   const [initialProductTypeName, setInitialProductTypeName] = useState("");
   const form = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
+    resolver: zodResolver(
+      (level === 1 ? categoryLevel1Schema : categorySchema) as any
+    ),
     defaultValues: {
       name: "",
       slug: "",
@@ -83,6 +106,9 @@ export function CategoryDialog({
       // parentId: parentCategory?.id || null,
     },
   });
+
+  console.log("[v0] form errors:", form.formState.errors);
+
 
   useEffect(() => {
     if (category) {
@@ -179,26 +205,28 @@ export function CategoryDialog({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="productTypeId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Loại sản phẩm</FormLabel>
-                  <FormControl>
-                    <ProductTypeSelector
-                      value={field.value}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        setInitialProductTypeName("");
-                      }}
-                      initialName={initialProductTypeName}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {level === 1 && (
+              <FormField
+                control={form.control}
+                name="productTypeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Loại sản phẩm</FormLabel>
+                    <FormControl>
+                      <ProductTypeSelector
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setInitialProductTypeName("");
+                        }}
+                        initialName={initialProductTypeName}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* <FormField
               control={form.control}
