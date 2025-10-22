@@ -144,6 +144,7 @@ export default function EditProductPage() {
       {
         level: 1,
         productTypeId: form.getValues("productTypeId"),
+        limit: 0,
       },
       {
         enabled: !!form.getValues("productTypeId"),
@@ -155,6 +156,7 @@ export default function EditProductPage() {
       {
         level: 2,
         parentId: form.getValues("categoryLevel1Id"),
+        limit: 0, 
       },
       {
         enabled: !!form.getValues("categoryLevel1Id"),
@@ -166,6 +168,7 @@ export default function EditProductPage() {
       {
         level: 3,
         parentId: form.getValues("categoryLevel2Id"),
+        limit: 0, 
       },
       {
         enabled: !!form.getValues("categoryLevel2Id"),
