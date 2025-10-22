@@ -24,8 +24,8 @@ export default function AdminLoginPage() {
   const { mutate, isPending } = useLogin();
 
   const [form, setForm] = useState({
-    email: "admin@ndbio.com",
-    password: "123456",
+    email: "",
+    password: "",
   });
 
   const handleLogin = (e: React.FormEvent) => {
@@ -124,21 +124,6 @@ export default function AdminLoginPage() {
               >
                 {isPending ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
-
-              <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
-                <p className="text-sm font-medium mb-2 text-foreground">
-                  Thông tin đăng nhập demo:
-                </p>
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <p>
-                    <span className="font-medium">Email:</span>{" "}
-                    admin@medequip.vn
-                  </p>
-                  <p>
-                    <span className="font-medium">Mật khẩu:</span> admin123
-                  </p>
-                </div>
-              </div>
             </form>
           </CardContent>
         </Card>

@@ -135,6 +135,7 @@ export default function CategoryDetailPage() {
               <TableRow>
                 <TableHead>Tên danh mục</TableHead>
                 <TableHead>Slug</TableHead>
+                <TableHead>Loại sản phẩm</TableHead>
                 <TableHead className="text-center">Danh mục con</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
@@ -166,6 +167,11 @@ export default function CategoryDetailPage() {
                       <code className="text-sm bg-muted px-2 py-1 rounded">
                         {category.slug}
                       </code>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm bg-muted px-2 py-1 rounded">
+                        {category.productType?.name || "-"}
+                      </span>
                     </TableCell>
                     <TableCell className="text-center">
                       {category.children.length > 0 ? (

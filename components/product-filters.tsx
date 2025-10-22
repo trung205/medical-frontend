@@ -16,6 +16,7 @@ export function ProductFilters({
 
   const {data: categoriesData}: any = useCategories({
     productTypeSlug,
+    limit: 0
   }, {
     onSuccess: (data: any) => {
       console.log(data)
@@ -187,17 +188,15 @@ const CategoryItem = ({ category, onCategorySelect, currentSlug = '', depth = 0 
 
 export default CategoryItem;
 
-// Đặt hàm này ở ngoài component chính hoặc trong một file utils
 const buildCategoryTree = (categories: any = []) => {
+  console.log("categories: ", categories)
   const map: any = {};
   const tree: any[] = [];
 
-  // Tạo map id -> category
   categories?.forEach((cat: any) => {
     map[cat.id] = { ...cat, children: [] };
   });
 
-  // Xây dựng cây
   categories?.forEach((cat: any) => {
     if (cat.parentId === null) {
       tree.push(map[cat.id]);

@@ -164,6 +164,7 @@ export default function CategoriesPage() {
               <TableRow>
                 <TableHead>Tên danh mục</TableHead>
                 <TableHead>Slug</TableHead>
+                <TableHead>Loại sản phẩm</TableHead>
                 <TableHead className="text-center">Danh mục con</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
@@ -195,6 +196,11 @@ export default function CategoriesPage() {
                       <code className="text-sm bg-muted px-2 py-1 rounded">
                         {category.slug}
                       </code>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm bg-muted px-2 py-1 rounded">
+                        {category.productType?.name || "-"}
+                      </span>
                     </TableCell>
                     <TableCell className="text-center">
                       {category.children.length > 0 ? (
@@ -260,6 +266,7 @@ export default function CategoriesPage() {
         onOpenChange={setIsDialogOpen}
         onHandleSubmitEdit={handleSubmitEdit}
         onHandleSubmitCreate={handleSubmitCreate}
+        level={1}
       />
     </div>
   );
