@@ -201,7 +201,7 @@ export default function HomePage() {
         </div>
       </section>
       <section className="py-16">
-        <div className="container mx-auto px-36">
+        <div className="container mx-auto px-8 md:px-36">
           <h2 className="text-5xl font-bold text-center mb-12">
             Sản phẩm cung ứng
           </h2>

@@ -55,6 +55,11 @@ const menuItems = [
     ],
   },
   {
+    title: "Dữ liệu",
+    href: "/admin/import-data",
+    icon: Package,
+  },
+  {
     title: "Cài đặt",
     href: "/admin/settings",
     icon: Settings,

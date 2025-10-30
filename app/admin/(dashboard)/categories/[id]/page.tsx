@@ -145,10 +145,6 @@ export default function CategoryDetailPage() {
                 categories?.map((category: any) => (
                   <TableRow
                     key={category.id}
-                    className="cursor-pointer"
-                    onClick={() =>
-                      router.push(`/admin/categories/${category.id}`)
-                    }
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -174,7 +170,6 @@ export default function CategoryDetailPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                      {category.children.length > 0 ? (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -183,12 +178,9 @@ export default function CategoryDetailPage() {
                           }
                           className="text-primary"
                         >
-                          {category.children.length} danh mục
+                          {category?.children?.length || 0} danh mục
                           <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
