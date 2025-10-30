@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Search, Menu, ChevronDown } from "lucide-react";
+import { ShoppingCart, Search, Menu, ChevronDown, X } from "lucide-react"; // Import 'X' icon for close button
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,6 +10,7 @@ import Image from "next/image";
 
 export function Header() {
   const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // New state for mobile menu
   const pathname = usePathname();
 
   const { data: productTypesData }: any = useProductTypes({});
@@ -24,6 +25,27 @@ export function Header() {
   const isActive = (path: string) => {
     return pathname === path;
   };
+
+  const navItems = [
+    { name: "Trang chủ", href: "/" },
+    { name: "Giải pháp", href: "/giai-phap" },
+    { name: "Blog", href: "/blog" },
+    { name: "Về chúng tôi", href: "/gioi-thieu" },
+    { name: "Tuyển dụng", href: "/tuyen-dung" },
+    { name: "Liên hệ", href: "/lien-he" },
+  ];
+
+  const isNavItemActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname?.startsWith(href);
+  };
+
+  const handleMobileNavClick = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <header className="border-b border-border bg-[#e5eff3]">
       <div className="bg-primary text-primary-foreground py-3">
@@ -46,6 +68,7 @@ export function Header() {
                 className="object-cover"
               />
             </Link>
+
             <nav className="hidden lg:flex items-center gap-6">
               <Link
                 href="/"
@@ -61,6 +84,7 @@ export function Header() {
               <div
                 className="relative"
                 onMouseEnter={() => setShowProductDropdown(true)}
+                onMouseLeave={() => setShowProductDropdown(false)} // Add onMouseLeave to the parent
               >
                 <button
                   className={`text-foreground hover:text-primary transition-colors flex items-center gap-1 relative ${
@@ -79,8 +103,6 @@ export function Header() {
                 {showProductDropdown && (
                   <div
                     className="absolute top-full left-0 mt-2 w-36 bg-card border border-border rounded-lg shadow-lg py-2 z-50"
-                    onMouseEnter={() => setShowProductDropdown(true)}
-                    onMouseLeave={() => setShowProductDropdown(false)}
                   >
                     {formattedProductTypes?.map((type: any, index: number) => (
                       <Link
@@ -139,7 +161,7 @@ export function Header() {
                 }`}
               >
                 Tuyển dụng
-                {isActive("/tuyen-dung") && ( 
+                {isActive("/tuyen-dung") && (
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary" />
                 )}
               </Link>
@@ -147,7 +169,7 @@ export function Header() {
               <Link
                 href="/lien-he"
                 className={`text-foreground hover:text-primary transition-colors relative ${
-                  isActive("/lien-he") ? "text-primary font-semibold" : ""  
+                  isActive("/lien-he") ? "text-primary font-semibold" : ""
                 }`}
               >
                 Liên hệ
@@ -159,35 +181,101 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* <div className="hidden md:flex items-center bg-secondary rounded-lg px-3 py-2 min-w-[300px]">
-              <Search className="h-4 w-4 text-muted-foreground mr-2" />
-              <input
-                type="text"
-                placeholder="Tìm kiếm thiết bị y tế..."
-                className="bg-transparent border-none outline-none flex-1 text-sm"
-              />
-            </div> */}
             <SearchBox />
-            {/* <Button
-              variant="outline"
-              size="icon"
-              className="relative bg-transparent"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
-              </span>
-            </Button> */}
+            {/* Mobile Menu Button */}
             <Button
               variant="outline"
               size="icon"
               className="lg:hidden bg-transparent"
+              onClick={() => setIsMobileMenuOpen(true)} // Open mobile menu
             >
               <Menu className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
+
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] bg-background lg:hidden">
+          <div className="flex items-center justify-between border-b border-border px-4 bg-[#e5eff3]">
+            <Link href="/" onClick={handleMobileNavClick}>
+              <Image
+                src={"/logo.jpeg"}
+                alt={`Logo}`}
+                width={73}
+                height={32}
+                className="object-cover"
+              />
+            </Link>
+            <Button
+              variant="outline"
+              size="icon"
+              className="bg-transparent"
+              onClick={() => setIsMobileMenuOpen(false)} 
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <nav className="p-4 flex flex-col gap-2">
+            <Link
+              href="/"
+              className={`block px-4 py-3 text-lg font-medium rounded-lg ${
+                isActive("/")
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground hover:bg-muted"
+              }`}
+              onClick={handleMobileNavClick}
+            >
+              Trang chủ
+            </Link>
+
+            <div className="border border-border rounded-lg">
+              <button
+                className={`flex items-center justify-between w-full px-4 py-3 text-lg font-medium rounded-t-lg ${
+                  pathname?.startsWith("/san-pham")
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-muted"
+                }`}
+                onClick={() => setShowProductDropdown((prev) => !prev)}
+              >
+                Sản phẩm
+                <ChevronDown className={`h-5 w-5 transition-transform ${showProductDropdown ? 'rotate-180' : 'rotate-0'}`} />
+              </button>
+
+              {showProductDropdown && (
+                <div className="bg-card border-t border-border">
+                  {formattedProductTypes?.map((type: any, index: number) => (
+                    <Link
+                      key={index}
+                      href={type.href}
+                      className="block px-8 py-2 text-base font-medium text-foreground hover:bg-muted"
+                      onClick={handleMobileNavClick}
+                    >
+                      {type.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {navItems.slice(1).map((item, index) => ( 
+              <Link
+                key={index}
+                href={item.href}
+                className={`block px-4 py-3 text-lg font-medium rounded-lg ${
+                  isNavItemActive(item.href)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-muted"
+                }`}
+                onClick={handleMobileNavClick}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
