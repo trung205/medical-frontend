@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { BlogTable } from "@/components/admin/blog-table"
 import Link from "next/link"
-import { useBlogs } from "@/hooks/admin/useBlogs"
+import { useBlogs, useDeleteBlog } from "@/hooks/admin/useBlogs"
 import { CommonPagination } from "@/components/ui/common-pagination"
 
 
@@ -20,11 +20,13 @@ export default function BlogManagementPage() {
     page,
     ...conditions,
   });
+  const {mutate: deleteBlog} = useDeleteBlog();
   const { data: blogs = [], pagination = {} } = blogsData || {};
   const { totalPages, total } = pagination || {};
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: any) => {
     if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+      deleteBlog(Number(id));
     }
   }
 
