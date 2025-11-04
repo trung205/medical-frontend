@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Award, Shield, CheckCircle, Globe } from "lucide-react"
+import Link from "next/link"
 
 const certifications = [
   // {
@@ -110,7 +111,10 @@ export function CertificationsSection() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Chúng tôi luôn tìm kiếm các đối tác mới để mang đến những giải pháp y tế tốt nhất
                 </p>
-                <Badge className="bg-primary">Liên hệ hợp tác</Badge>
+                <Link href="/lien-he">
+                  <Badge className="bg-primary">Liên hệ hợp tác</Badge>
+                </Link>
+                
               </CardContent>
             </Card>
           </div>

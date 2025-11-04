@@ -18,10 +18,10 @@ export function Footer() {
               >
                 <Facebook className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a>
-              {/* <a href="https://www.youtube.com/channel/UCY31h33h1h33h1h33h1h33" target="_blank" rel="noopener noreferrer">
+               <a href="https://www.youtube.com/@NDBioVN" target="_blank" rel="noopener noreferrer">
                 <Youtube className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a>
-              <a href="https://www.linkedin.com/company/medequip-pro" target="_blank" rel="noopener noreferrer">
+              {/*<a href="https://www.linkedin.com/company/medequip-pro" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="h-5 w-5 cursor-pointer hover:text-accent transition-colors" />
               </a> */}
             </div>

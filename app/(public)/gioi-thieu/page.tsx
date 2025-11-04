@@ -10,7 +10,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen">
       <Header />
-      <AboutHero />
+      {/* <AboutHero /> */}
       <CompanyStats />
       {/* <CompanyHistory /> */}
       <CertificationsSection />

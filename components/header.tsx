@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Search, Menu, ChevronDown, X } from "lucide-react"; // Import 'X' icon for close button
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useProductTypes } from "@/hooks/user/useProductTypes";
@@ -10,8 +10,10 @@ import Image from "next/image";
 
 export function Header() {
   const [showProductDropdown, setShowProductDropdown] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // New state for mobile menu
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
   const pathname = usePathname();
+
+   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { data: productTypesData }: any = useProductTypes({});
 
@@ -44,6 +46,17 @@ export function Header() {
 
   const handleMobileNavClick = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setShowProductDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setShowProductDropdown(false);
+    }, 300);
   };
 
   return (
@@ -83,8 +96,8 @@ export function Header() {
               </Link>
               <div
                 className="relative"
-                onMouseEnter={() => setShowProductDropdown(true)}
-                onMouseLeave={() => setShowProductDropdown(false)} // Add onMouseLeave to the parent
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <button
                   className={`text-foreground hover:text-primary transition-colors flex items-center gap-1 relative ${
@@ -103,6 +116,8 @@ export function Header() {
                 {showProductDropdown && (
                   <div
                     className="absolute top-full left-0 mt-2 w-36 bg-card border border-border rounded-lg shadow-lg py-2 z-50"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                   >
                     {formattedProductTypes?.map((type: any, index: number) => (
                       <Link
@@ -211,7 +226,7 @@ export function Header() {
               variant="outline"
               size="icon"
               className="bg-transparent"
-              onClick={() => setIsMobileMenuOpen(false)} 
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -240,7 +255,11 @@ export function Header() {
                 onClick={() => setShowProductDropdown((prev) => !prev)}
               >
                 Sản phẩm
-                <ChevronDown className={`h-5 w-5 transition-transform ${showProductDropdown ? 'rotate-180' : 'rotate-0'}`} />
+                <ChevronDown
+                  className={`h-5 w-5 transition-transform ${
+                    showProductDropdown ? "rotate-180" : "rotate-0"
+                  }`}
+                />
               </button>
 
               {showProductDropdown && (
@@ -258,8 +277,8 @@ export function Header() {
                 </div>
               )}
             </div>
-            
-            {navItems.slice(1).map((item, index) => ( 
+
+            {navItems.slice(1).map((item, index) => (
               <Link
                 key={index}
                 href={item.href}
