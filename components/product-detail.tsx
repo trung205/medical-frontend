@@ -152,7 +152,7 @@ export function ProductDetail({ product }: any) {
             </Card>
           </TabsContent>
 
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 px-0 ">
             <TabsContent value="specifications" className="mt-6">
               <Card>
                 <CardContent className="pt-6">
@@ -161,10 +161,10 @@ export function ProductDetail({ product }: any) {
                       JSON.parse(product?.specifications).map((item: any) => (
                         <div
                           key={item.key}
-                          className="flex justify-between py-2 border-b border-border/50"
+                          className="flex flex-col gap-4 justify-between py-2 border-b border-border/50 md:flex-row"
                         >
-                          <span className="font-medium">{item.key}:</span>
-                          <span className="text-muted-foreground">
+                          <span className="font-semibold">{item.key}:</span>
+                          <span className="text-muted-foreground text-end md:text-start">
                             {item.value}
                           </span>
                         </div>

@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Plus,
@@ -34,7 +35,7 @@ import {
   useDeleteCategory,
   useUpdateCategory,
 } from "@/hooks/admin/useCategories";
-import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function CategoryDetailPage() {
   const params = useParams();
@@ -124,6 +125,27 @@ export default function CategoryDetailPage() {
           Thêm danh mục
         </Button>
       </div>
+      <div className="flex items-center justify-between gap-4">
+        <Input
+          placeholder="Tìm kiếm danh mục..."
+          value={condition?.search}
+          onChange={(e) =>
+            setCondition({ ...condition, search: e.target.value })
+          }
+          className="max-w-sm pr-10
+              border-gray-300
+              bg-white
+              dark:bg-zinc-900
+              dark:border-zinc-700
+              shadow-sm
+              hover:border-gray-400
+              focus:border-primary
+              focus:ring-2
+              focus:ring-primary/40
+              transition-all
+              duration-200"
+        />
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Danh mục cấp {category?.level + 1}</CardTitle>
@@ -133,19 +155,25 @@ export default function CategoryDetailPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Tên danh mục</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Loại sản phẩm</TableHead>
-                <TableHead className="text-center">Danh mục con</TableHead>
+                {category?.level + 1 !== 3 && (
+                  <TableHead className="text-center">Danh mục con</TableHead>
+                )}
                 <TableHead className="text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {categories?.length > 0 ? (
                 categories?.map((category: any) => (
-                  <TableRow
-                    key={category.id}
-                  >
+                  <TableRow key={category.id}>
+                    <TableCell>
+                      <span className="text-sm bg-muted px-2 py-1 rounded">
+                        {category.id || "-"}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">
@@ -169,7 +197,8 @@ export default function CategoryDetailPage() {
                         {category.productType?.name || "-"}
                       </span>
                     </TableCell>
-                    <TableCell className="text-center">
+                    {category?.level !== 3 && (
+                      <TableCell className="text-center">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -181,7 +210,8 @@ export default function CategoryDetailPage() {
                           {category?.children?.length || 0} danh mục
                           <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
-                    </TableCell>
+                      </TableCell>
+                    )}
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button

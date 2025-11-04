@@ -112,7 +112,7 @@ export default function CategoriesPage() {
       </div>
       <div className="flex items-center justify-between gap-4">
         <Input
-          placeholder="Tìm kiếm sản phẩm..."
+          placeholder="Tìm kiếm danh mục..."
           value={conditions?.search}
           onChange={(e) =>
             setConditions({ ...conditions, search: e.target.value })
@@ -162,6 +162,7 @@ export default function CategoriesPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Tên danh mục</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead>Loại sản phẩm</TableHead>
@@ -175,6 +176,11 @@ export default function CategoriesPage() {
                   <TableRow
                     key={category.id}
                   >
+                    <TableCell>
+                      <span className="text-sm bg-muted px-2 py-1 rounded">
+                        {category.id || "-"}
+                      </span>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">

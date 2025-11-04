@@ -100,6 +100,7 @@ export default function ProductTypesPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>ID</TableHead>
                 <TableHead>Tên loại sản phẩm</TableHead>
                 <TableHead>Slug</TableHead>
                 <TableHead className="text-right">Thao tác</TableHead>
@@ -109,6 +110,7 @@ export default function ProductTypesPage() {
               {productTypes?.length > 0 ? (
                 productTypes?.map((productType: any) => (
                   <TableRow key={productType.id}>
+                    <TableCell>{productType.id}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">
