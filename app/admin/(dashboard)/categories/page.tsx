@@ -10,6 +10,7 @@ import {
   FolderOpen,
   ChevronDown,
   Check,
+  Download,
 } from "lucide-react";
 import {
   Card,
@@ -97,6 +98,28 @@ export default function CategoriesPage() {
     });
   };
 
+  const handleExport = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/export/download`, {
+        method: 'GET',
+      })
+      if (!res.ok) throw new Error('Lỗi khi tải file')
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'categories_hierarchy.xlsx'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error(err)
+      alert('Không thể tải file')
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -105,10 +128,16 @@ export default function CategoriesPage() {
             Quản lý danh mục
           </h1>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm danh mục
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button onClick={handleExport} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Tải file
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className="w-4 h-4 mr-2" />
+            Thêm danh mục
+          </Button>
+        </div>
       </div>
       <div className="flex items-center justify-between gap-4">
         <Input
@@ -173,9 +202,7 @@ export default function CategoriesPage() {
             <TableBody>
               {categories?.length > 0 ? (
                 categories?.map((category: any) => (
-                  <TableRow
-                    key={category.id}
-                  >
+                  <TableRow key={category.id}>
                     <TableCell>
                       <span className="text-sm bg-muted px-2 py-1 rounded">
                         {category.id || "-"}
@@ -205,17 +232,17 @@ export default function CategoriesPage() {
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            router.push(`/admin/categories/${category.id}`)
-                          }
-                          className="text-primary"
-                        >
-                          {category?.children?.length || 0} danh mục
-                          <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          router.push(`/admin/categories/${category.id}`)
+                        }
+                        className="text-primary"
+                      >
+                        {category?.children?.length || 0} danh mục
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
