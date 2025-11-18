@@ -65,7 +65,6 @@ export const useCreateProductType = () => {
 
     onSuccess: (res: any) => {
       if (res.success) {
-        console.log("createProductType success:", res);
         toast({
           title: "Thành công",
           description: "Tạo loại sản phẩm thành công!",
@@ -75,7 +74,6 @@ export const useCreateProductType = () => {
     },
 
     onError: (error: any) => {
-      console.log("createProductType error:", error);
       toast({
         variant: "destructive",
         title: "Lỗi",

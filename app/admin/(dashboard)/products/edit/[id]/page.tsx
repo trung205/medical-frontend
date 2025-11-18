@@ -78,12 +78,13 @@ const productSchema = z.object({
       invalid_type_error: "Loại sản phẩm không hợp lệ",
     })
     .min(1, { message: "Chọn loại sản phẩm" }),
-  imagesUpdate: z
-    .array(z.any()),
-  images: z
-    .array(z.any()),
+  imagesUpdate: z.array(z.any()),
+  images: z.array(z.any()),
   specifications: z
     .array(z.object({ key: z.string(), value: z.string() }))
+    .optional(),
+  customFields: z
+    .array(z.object({ title: z.string(), content: z.string() }))
     .optional(),
 });
 
@@ -104,6 +105,10 @@ export default function EditProductPage() {
   const [specifications, setSpecifications] = useState<
     Array<{ key: string; value: string }>
   >([{ key: "", value: "" }]);
+
+  const [customFields, setCustomFields] = useState<
+    Array<{ title: string; content: string }>
+  >([{ title: "", content: "" }]);
 
   const {
     data: product,
@@ -133,10 +138,11 @@ export default function EditProductPage() {
       images: [],
       productTypeId: undefined,
       specifications: [{ key: "", value: "" }],
+      customFields: [{ title: "", content: "" }],
     },
   });
 
-  console.log("form error:", form.formState.errors)
+  console.log("form error:", form.formState.errors);
   console.log("form values:", form.getValues());
 
   const { data: level1Categories, isLoading: isLoadingLevel1 }: any =
@@ -156,7 +162,7 @@ export default function EditProductPage() {
       {
         level: 2,
         parentId: form.getValues("categoryLevel1Id"),
-        limit: 0, 
+        limit: 0,
       },
       {
         enabled: !!form.getValues("categoryLevel1Id"),
@@ -168,7 +174,7 @@ export default function EditProductPage() {
       {
         level: 3,
         parentId: form.getValues("categoryLevel2Id"),
-        limit: 0, 
+        limit: 0,
       },
       {
         enabled: !!form.getValues("categoryLevel2Id"),
@@ -368,9 +374,32 @@ export default function EditProductPage() {
     form.setValue("specifications", newSpecs);
   };
 
+  const addCustomField = () => {
+    const newCustomFields = [...customFields, { title: "", content: "" }];
+    setCustomFields(newCustomFields);
+    form.setValue("customFields", newCustomFields);
+  };
+
+  const removeCustomField = (index: number) => {
+    const newCustomFields = customFields.filter((_, i) => i !== index);
+    setCustomFields(newCustomFields);
+    form.setValue("customFields", newCustomFields);
+  };
+
+  const updateCustomField = (
+    index: number,
+    field: "title" | "content",
+    value: string
+  ) => {
+    const newCustomFields = [...customFields];
+    newCustomFields[index][field] = value;
+    setCustomFields(newCustomFields);
+    form.setValue("customFields", newCustomFields);
+  };
+
   useEffect(() => {
     if (product) {
-      const { images, specifications, ...rest } = product;
+      const { images, specifications, customFields, ...rest } = product;
       form.reset({
         ...rest,
         ...(rest.categoryLevel1Id && {
@@ -384,10 +413,10 @@ export default function EditProductPage() {
         }),
         imagesUpdate: images,
         images: images,
-        status: product?.status || 'active',
+        status: product?.status || "active",
         ...(specifications && {
           specifications: JSON.parse(specifications),
-        })
+        }),
       });
       if (images && images.length > 0) {
         setImagePreviews(images.map((item: any) => getImageProduct(item)));
@@ -397,6 +426,9 @@ export default function EditProductPage() {
       }
       if (specifications && specifications.length > 0) {
         setSpecifications(JSON.parse(specifications));
+      }
+      if (customFields && customFields.length > 0) {
+        setCustomFields(customFields);
       }
     }
   }, [product, form]);
@@ -830,36 +862,98 @@ export default function EditProductPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {specifications?.length > 0 && specifications?.map((spec, index) => (
-                      <div key={index} className="flex gap-3 items-start">
-                        <Input
-                          placeholder="Tên thông số (VD: Công suất)"
-                          value={spec.key}
-                          onChange={(e) =>
-                            updateSpecification(index, "key", e.target.value)
-                          }
-                          className="flex-1"
-                        />
-                        <Input
-                          placeholder="Giá trị (VD: 1000W)"
-                          value={spec.value}
-                          onChange={(e) =>
-                            updateSpecification(index, "value", e.target.value)
-                          }
-                          className="flex-1"
-                        />
-                        {specifications.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeSpecification(index)}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
+                    {specifications?.length > 0 &&
+                      specifications?.map((spec, index) => (
+                        <div key={index} className="flex gap-3 items-start">
+                          <Input
+                            placeholder="Tên thông số (VD: Công suất)"
+                            value={spec.key}
+                            onChange={(e) =>
+                              updateSpecification(index, "key", e.target.value)
+                            }
+                            className="flex-1"
+                          />
+                          <Input
+                            placeholder="Giá trị (VD: 1000W)"
+                            value={spec.value}
+                            onChange={(e) =>
+                              updateSpecification(
+                                index,
+                                "value",
+                                e.target.value
+                              )
+                            }
+                            className="flex-1"
+                          />
+                          {specifications.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeSpecification(index)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                <div className="col-span-2 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <FormLabel>Tùy chỉnh</FormLabel>
+                      <FormDescription>
+                        Thêm các tùy chỉnh của sản phẩm
+                      </FormDescription>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addCustomField}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Thêm tùy chỉnh
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {customFields?.length > 0 &&
+                      customFields?.map((customField, index) => (
+                        <div key={index} className="flex gap-3 items-start">
+                          <div className="py-2">{index + 1}.</div>
+                          <div className="flex flex-col gap-3 items-start">
+                            <Input
+                              placeholder="Tên tùy chỉnh"
+                              value={customField.title}
+                              onChange={(e) =>
+                                updateCustomField(
+                                  index,
+                                  "title",
+                                  e.target.value
+                                )
+                              }
+                              className="flex-1 py-3"
+                            />
+                            <RichTextEditor
+                              value={customField.content}
+                              onChange={(value) =>
+                                updateCustomField(index, "content", value)
+                              }
+                            />
+
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeCustomField(index)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>

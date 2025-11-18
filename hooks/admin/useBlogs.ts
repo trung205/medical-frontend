@@ -59,7 +59,6 @@ export const useCreateBlog = () => {
 
     onSuccess: (res) => {
       if (res.success) {
-        console.log("createBlog success:", res);
         toast({
           title: "Thành công",
           description: "Tạo bài viết thành công!",  
@@ -124,7 +123,6 @@ export const useCreateMultipleBlogImages = () => {
     
 
     onError: (error: any) => {
-      console.log("createMultipleBlogImages error:", error);
       toast({
         variant: "destructive",
         title: "Lỗi",
@@ -153,7 +151,6 @@ export const useUpdateBlogImages = () => {
     
 
     onError: (error: any) => {
-      console.log("createMultipleBlogImages error:", error);
       toast({
         variant: "destructive",
         title: "Lỗi",

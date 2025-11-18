@@ -24,7 +24,6 @@ export function ProductFilters({
   });
 
   const categoryList = useMemo(() => buildCategoryTree(categoriesData?.data || []), [categoriesData]);
-  console.log("categoryList: ", categoryList)
 
 
   const onCategorySelect = (categorySlug: string) => {
@@ -189,7 +188,6 @@ const CategoryItem = ({ category, onCategorySelect, currentSlug = '', depth = 0 
 export default CategoryItem;
 
 const buildCategoryTree = (categories: any = []) => {
-  console.log("categories: ", categories)
   const map: any = {};
   const tree: any[] = [];
 
