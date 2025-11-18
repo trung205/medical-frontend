@@ -9,7 +9,7 @@ export function isAuthenticated(): boolean {
 
 export function getAdminUser() {
   if (typeof window === "undefined") return null
-  const userStr = localStorage.getItem("admin_user")
+  const userStr = localStorage.getItem("adminToken")
   if (!userStr) return null
   try {
     return JSON.parse(userStr)
@@ -20,6 +20,5 @@ export function getAdminUser() {
 
 export function logout() {
   localStorage.removeItem("adminToken")
-  localStorage.removeItem("admin_user")
   window.location.href = "/admin/login"
 }

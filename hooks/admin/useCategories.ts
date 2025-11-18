@@ -64,7 +64,6 @@ export const useCreateCategory = () => {
 
     onSuccess: (res) => {
       if (res.success) {
-        console.log("createCategory success:", res);
         toast({
           title: "Thành công",
           description: "Tạo danh mục thành công!",

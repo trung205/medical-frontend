@@ -33,7 +33,6 @@ export default function ProductTypeDetailPage({ params }: any) {
     productTypeSlug,
     limit: 12,
   });
-  console.log("products", products);
   const handleShowProductDetail = (product: any) => {
     router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);
   };
@@ -42,8 +41,6 @@ export default function ProductTypeDetailPage({ params }: any) {
     products?.pages
       .flatMap((page: any) => page.data)
       .flatMap((item: any) => item.data) || [];
-  console.log("hasNextPage", hasNextPage);
-  console.log("formattedProducts", formattedProducts);
 
   return (
     <main className="min-h-screen">

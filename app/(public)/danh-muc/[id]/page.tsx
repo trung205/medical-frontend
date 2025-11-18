@@ -38,7 +38,6 @@ export default function CategoriesDetailPage({ params }: any) {
     categorySlug: id,
     limit: 6,
   })
-  console.log("products", products)
   const handleShowProductDetail = (product: any) => {
     router.push(`/san-pham/chi-tiet/${product?.slug || ""}`)
   }

@@ -49,10 +49,6 @@ export function ProductDetail({ product }: any) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  console.log("product", product);
-
-  // const discountPercentage = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -132,9 +128,21 @@ export function ProductDetail({ product }: any) {
 
       <div className="mt-16">
         <Tabs defaultValue="description" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList
+            className={`grid w-full grid-cols-${
+              product?.customFields?.length > 0
+                ? 2 + product?.customFields?.length
+                : 2
+            }`}
+          >
             <TabsTrigger value="description">Mô tả</TabsTrigger>
             <TabsTrigger value="specifications">Thông số kỹ thuật</TabsTrigger>
+            {product?.customFields?.length > 0 &&
+              product?.customFields?.map((item: any) => (
+                <TabsTrigger key={item.id} value={item.id}>
+                  {item.title}
+                </TabsTrigger>
+              ))}
             {/* <TabsTrigger value="warranty">Bảo hành & Vận chuyển</TabsTrigger> */}
             {/* <TabsTrigger value="reviews">Đánh giá</TabsTrigger> */}
           </TabsList>
@@ -175,51 +183,21 @@ export function ProductDetail({ product }: any) {
             </TabsContent>
           </CardContent>
 
-          <TabsContent value="warranty" className="mt-6">
-            <Card>
-              <CardContent className="pt-6 space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">
-                    Chính sách bảo hành
-                  </h3>
-                  {/* <p className="text-muted-foreground">{product.warranty}</p> */}
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">
-                    Vận chuyển & Lắp đặt
-                  </h3>
-                  {/* <p className="text-muted-foreground">{product.shipping}</p> */}
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Dịch vụ hỗ trợ</h3>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li>• Tư vấn kỹ thuật 24/7</li>
-                    <li>• Đào tạo sử dụng thiết bị</li>
-                    <li>• Bảo trì định kỳ</li>
-                    <li>• Hỗ trợ từ xa</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="reviews" className="mt-6">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">
-                    Tính năng đánh giá sẽ được cập nhật sớm
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {product?.customFields?.length > 0 &&
+            product?.customFields?.map((item: any) => (
+              <TabsContent key={item.id} value={item.id} className="mt-6">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div
+                      className="prose max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: item?.content || "",
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            ))}
         </Tabs>
       </div>
     </div>

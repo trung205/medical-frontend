@@ -64,7 +64,6 @@ export const useCreateProduct = () => {
 
     onSuccess: (res) => {
       if (res.success) {
-        console.log("createProduct success:", res);
         toast({
           title: "Thành công",
           description: "Tạo sản phẩm thành công!",
@@ -74,7 +73,6 @@ export const useCreateProduct = () => {
     },
 
     onError: (error: any) => {
-      console.log("createProduct error:", error);
       toast({
         variant: "destructive",
         title: "Lỗi",
@@ -130,7 +128,6 @@ export const useCreateMultipleProductImages = () => {
     
 
     onError: (error: any) => {
-      console.log("createMultipleProductImages error:", error);
       toast({
         variant: "destructive",
         title: "Lỗi",

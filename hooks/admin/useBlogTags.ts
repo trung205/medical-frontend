@@ -59,7 +59,6 @@ export const useCreateBlogTag = () => {
 
     onSuccess: (res) => {
       if (res.success) {
-        console.log("createBlogTag success:", res);
         toast({
           title: "Thành công",
           description: "Tạo tag thành công!",     

@@ -78,6 +78,9 @@ const productSchema = z.object({
   specifications: z
     .array(z.object({ key: z.string(), value: z.string() }))
     .optional(),
+  customFields: z
+    .array(z.object({ title: z.string(), content: z.string() }))
+    .optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -88,6 +91,9 @@ export default function CreateProductPage() {
   const [specifications, setSpecifications] = useState<
     Array<{ key: string; value: string }>
   >([{ key: "", value: "" }]);
+  const [customFields, setCustomFields] = useState<
+    Array<{ title: string; content: string }>
+  >([{ title: "", content: "" }]);
   const { mutate: mutateCreate, isPending: isCreating } = useCreateProduct();
   const { mutate: createProductImages } = useCreateMultipleProductImages();
 
@@ -108,6 +114,7 @@ export default function CreateProductPage() {
       images: [],
       productTypeId: undefined,
       specifications: [{ key: "", value: "" }],
+      customFields: [{ title: "", content: "" }],
     },
   });
 
@@ -285,6 +292,29 @@ export default function CreateProductPage() {
     newSpecs[index][field] = value;
     setSpecifications(newSpecs);
     form.setValue("specifications", newSpecs);
+  };
+
+  const addCustomField = () => {
+    const newCustomFields = [...customFields, { title: "", content: "" }];
+    setCustomFields(newCustomFields);
+    form.setValue("customFields", newCustomFields);
+  };
+
+  const removeCustomField = (index: number) => {
+    const newCustomFields = customFields.filter((_, i) => i !== index);
+    setCustomFields(newCustomFields);
+    form.setValue("customFields", newCustomFields);
+  };
+
+  const updateCustomField = (
+    index: number,
+    field: "title" | "content",
+    value: string
+  ) => {
+    const newCustomFields = [...customFields];
+    newCustomFields[index][field] = value;
+    setCustomFields(newCustomFields);
+    form.setValue("customFields", newCustomFields);
   };
 
   return (
@@ -705,6 +735,63 @@ export default function CreateProductPage() {
                         )}
                       </div>
                     ))}
+                  </div>
+                </div>
+                <div className="col-span-2 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <FormLabel>Tùy chỉnh</FormLabel>
+                      <FormDescription>
+                        Thêm các tùy chỉnh của sản phẩm
+                      </FormDescription>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addCustomField}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Thêm tùy chỉnh
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {customFields?.length > 0 &&
+                      customFields?.map((customField, index) => (
+                        <div key={index} className="flex gap-3 items-start">
+                          <div className="py-2">{index + 1}.</div>
+                          <div className="flex flex-col gap-3 items-start">
+                            <Input
+                              placeholder="Tên tùy chỉnh"
+                              value={customField.title}
+                              onChange={(e) =>
+                                updateCustomField(
+                                  index,
+                                  "title",
+                                  e.target.value
+                                )
+                              }
+                              className="flex-1 py-3"
+                            />
+                            <RichTextEditor
+                              value={customField.content}
+                              onChange={(value) =>
+                                updateCustomField(index, "content", value)
+                              }
+                            />
+
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeCustomField(index)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>

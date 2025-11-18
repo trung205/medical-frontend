@@ -24,8 +24,6 @@ export default function CategoriesDetailPage({ params }: any) {
 
   const productType = productTypesData?.data?.[0] || {};
 
-  console.log("productTypesData: ", productTypesData);
-
   const {
     data: products,
     fetchNextPage,
@@ -36,7 +34,6 @@ export default function CategoriesDetailPage({ params }: any) {
     categorySlug,
     limit: 6,
   });
-  console.log("products", products);
   const handleShowProductDetail = (product: any) => {
     router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);
   };
@@ -45,8 +42,6 @@ export default function CategoriesDetailPage({ params }: any) {
     products?.pages
       .flatMap((page: any) => page.data)
       .flatMap((item: any) => item.data) || [];
-  console.log("hasNextPage", hasNextPage);
-  console.log("formattedProducts", formattedProducts);
 
   return (
     <main className="min-h-screen">
