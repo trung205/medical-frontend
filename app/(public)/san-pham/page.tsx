@@ -23,6 +23,8 @@ export default function ProductsPage() {
   }: any = useProductsInfinite({
     // categorySlug: id,
     limit: 6,
+    sortField: 'name',
+    sortOrder: 'asc'
   })
   const handleShowProductDetail = (product: any) => {
     router.push(`/san-pham/chi-tiet/${product?.slug || ""}`)

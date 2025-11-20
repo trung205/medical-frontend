@@ -42,7 +42,7 @@ export function ContactHero() {
               </div>
               <h3 className="font-semibold mb-2">Địa chỉ</h3>
               <p className="text-sm text-muted-foreground text-center">
-                Số 4 Ngô Thì Nhậm, phường Quang Trung
+                Số 4 Ngô Thì Nhậm, phường Hà Đông
                 <br />
                 Thành phố Hà Nội, Việt Nam
               </p>

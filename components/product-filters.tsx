@@ -16,7 +16,8 @@ export function ProductFilters({
 
   const {data: categoriesData}: any = useCategories({
     productTypeSlug,
-    limit: 0
+    limit: 0,
+    sortName: 'asc'
   }, {
     onSuccess: (data: any) => {
       console.log(data)

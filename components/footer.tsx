@@ -126,7 +126,7 @@ export function Footer() {
               >
                 <MapPin className="h-4 w-4 text-accent mt-0.5" />
                 <span>
-                  Số 4 Ngô Thì Nhậm, phường Quang Trung, Thành phố Hà Nội, Việt
+                  Số 4 Ngô Thì Nhậm, phường Hà Đông, Thành phố Hà Nội, Việt
                   Nam
                 </span>
               </a>

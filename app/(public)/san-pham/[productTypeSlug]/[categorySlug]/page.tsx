@@ -33,6 +33,8 @@ export default function CategoriesDetailPage({ params }: any) {
   }: any = useProductsInfinite({
     categorySlug,
     limit: 6,
+    sortField: 'name',
+    sortOrder: 'asc'
   });
   const handleShowProductDetail = (product: any) => {
     router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);

@@ -18,7 +18,7 @@ const teamMembers = [
     experience: "15+ năm kinh nghiệm",
     specialization:
       `Trưởng phòng Quản lý sản phẩm <br> Trưởng phòng kỹ thuật và dịch vụ khách hàng`,
-    image: "/b357019e-4cc9-4a96-85c3-eea8378ed255.jpeg",
+    image: "images/member/quang_tran.jpeg",
     education: "Tiến sĩ Kỹ thuật Y sinh - ĐH Bách Khoa",
   },
   {
