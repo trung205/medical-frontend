@@ -28,7 +28,6 @@ export function ProductGrid({ products, handleShowProductDetail }: any) {
       const offset = productList.offsetTop - 100; // cách 100px
       window.scrollTo({
         top: offset,
-        behavior: "smooth",
       });
     }
   }, []);
