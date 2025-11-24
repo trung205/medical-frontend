@@ -1,39 +1,47 @@
-"use client"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { ProductGrid } from "@/components/product-grid"
-import { ProductFilters } from "@/components/product-filters"
-import { useProducts, useProductsInfinite } from "@/hooks/user/useProducts"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button" // hoặc tự tạo button
-import { useState } from "react"
-
-
+"use client";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { ProductGrid } from "@/components/product-grid";
+import { ProductFilters } from "@/components/product-filters";
+import { useProducts, useProductsInfinite } from "@/hooks/user/useProducts";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button"; // hoặc tự tạo button
+import { useEffect, useState } from "react";
+import { CommonPagination } from "@/components/ui/common-pagination";
 
 export default function ProductsPage() {
   // const { id } = params
-  const router = useRouter()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const {
-    data: products,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  }: any = useProductsInfinite({
-    // categorySlug: id,
-    limit: 6,
-    sortField: 'name',
-    sortOrder: 'asc'
-  })
+  const pageFromUrl = Number(searchParams.get("page")) || 1;
+  const [page, setPage] = useState(pageFromUrl);
+
+  useEffect(() => {
+    setPage(pageFromUrl);
+  }, [pageFromUrl]);
+
+  const { data, isLoading }: any = useProducts({
+    page,
+    limit: 12,
+    sortField: "name",
+    sortOrder: "asc",
+  });
+
+  const { data: products = [], pagination = {} } = data || {};
+  const { totalPages } = pagination || {};
   const handleShowProductDetail = (product: any) => {
-    router.push(`/san-pham/chi-tiet/${product?.slug || ""}`)
-  }
+    router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);
+  };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
 
-  const formattedProducts =
-    products?.pages.flatMap((page: any) => page.data).flatMap((item: any) => item.data) || []
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
 
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
   return (
     <main className="min-h-screen">
       <Header />
@@ -43,7 +51,8 @@ export default function ProductsPage() {
             Danh Mục Sản Phẩm
           </h1>
           <p className="text-muted-foreground">
-            Khám phá bộ sưu tập đầy đủ các sản phẩm chất lượng cao từ các thương hiệu uy tín
+            Khám phá bộ sưu tập đầy đủ các sản phẩm chất lượng cao từ các thương
+            hiệu uy tín
           </p>
         </div>
 
@@ -57,19 +66,14 @@ export default function ProductsPage() {
             ) : (
               <>
                 <ProductGrid
-                  products={formattedProducts || []}
+                  products={products || []}
                   handleShowProductDetail={handleShowProductDetail}
                 />
-                {hasNextPage && (
-                  <div className="text-center mt-8">
-                    <Button
-                      onClick={() => fetchNextPage()}
-                      disabled={isFetchingNextPage}
-                    >
-                      {isFetchingNextPage ? "Đang tải thêm..." : "Tải thêm"}
-                    </Button>
-                  </div>
-                )}
+                <CommonPagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </>
             )}
           </div>
@@ -77,5 +81,5 @@ export default function ProductsPage() {
       </div>
       <Footer />
     </main>
-  )
+  );
 }

@@ -15,7 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ProductGrid({ products, handleShowProductDetail }: any) {
   // const ro
-  
+
   // const handleShowProductDetail = (product: any) => {
   //   toast({
   //     title: product?.name || "",
@@ -34,9 +34,9 @@ export function ProductGrid({ products, handleShowProductDetail }: any) {
   return (
     <div className="space-y-6" id="product-list">
       <div className="flex justify-between items-center">
-        <p className="text-muted-foreground">
+        {/* <p className="text-muted-foreground">
           Hiển thị {products?.length || 0} sản phẩm
-        </p>
+        </p> */}
         {/* <select className="border rounded-md px-3 py-2 text-sm">
           <option>Sắp xếp theo giá: Thấp đến cao</option>
           <option>Sắp xếp theo giá: Cao đến thấp</option>

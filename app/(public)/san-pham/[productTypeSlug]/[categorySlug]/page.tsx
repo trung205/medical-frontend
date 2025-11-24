@@ -3,16 +3,21 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductGrid } from "@/components/product-grid";
 import { ProductFilters } from "@/components/product-filters";
-import { useProducts, useProductsInfinite } from "@/hooks/user/useProducts";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button"; // hoặc tự tạo button
-import { useState } from "react";
+import { useProducts } from "@/hooks/user/useProducts";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useProductTypes } from "@/hooks/user/useProductTypes";
+import { CommonPagination } from "@/components/ui/common-pagination";
 
 export default function CategoriesDetailPage({ params }: any) {
   const { productTypeSlug, categorySlug } = params;
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const pageFromUrl = Number(searchParams.get("page")) || 1;
+  const [page, setPage] = useState(pageFromUrl);
+
   const { data: productTypesData }: any = useProductTypes(
     {
       search: productTypeSlug,
@@ -24,27 +29,33 @@ export default function CategoriesDetailPage({ params }: any) {
 
   const productType = productTypesData?.data?.[0] || {};
 
-  const {
-    data: products,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  }: any = useProductsInfinite({
+  const { data, isLoading }: any = useProducts({
+    page,
+    limit: 12,
+    sortField: "name",
+    sortOrder: "asc",
+    productTypeSlug,
     categorySlug,
-    limit: 6,
-    sortField: 'name',
-    sortOrder: 'asc'
   });
+
+  const { data: products = [], pagination = {} } = data || {};
+  const { totalPages } = pagination || {};
   const handleShowProductDetail = (product: any) => {
     router.push(`/san-pham/chi-tiet/${product?.slug || ""}`);
   };
 
-  const formattedProducts =
-    products?.pages
-      .flatMap((page: any) => page.data)
-      .flatMap((item: any) => item.data) || [];
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
 
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", newPage.toString());
+
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    setPage(pageFromUrl);
+  }, [pageFromUrl]);
   return (
     <main className="min-h-screen">
       <Header />
@@ -67,19 +78,14 @@ export default function CategoriesDetailPage({ params }: any) {
             ) : (
               <>
                 <ProductGrid
-                  products={formattedProducts || []}
+                  products={products || []}
                   handleShowProductDetail={handleShowProductDetail}
                 />
-                {hasNextPage && (
-                  <div className="text-center mt-8">
-                    <Button
-                      onClick={() => fetchNextPage()}
-                      disabled={isFetchingNextPage}
-                    >
-                      {isFetchingNextPage ? "Đang tải thêm..." : "Tải thêm"}
-                    </Button>
-                  </div>
-                )}
+                <CommonPagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </>
             )}
           </div>
